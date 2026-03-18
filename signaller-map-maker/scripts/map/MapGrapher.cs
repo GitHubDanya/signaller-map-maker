@@ -16,7 +16,8 @@ namespace signallerMap.Scripts.Graphics
         public const int StumpLength = 10;
         public const int SignalRadius = 5;
         public const string LineColor = "FFFFFF";
-        
+        public const string SelectedNodeColor = "ffce1c";
+        public const string SecondSelectedNodeColor = "ffde66";
 
         public override void _Ready()
         {
@@ -115,14 +116,27 @@ namespace signallerMap.Scripts.Graphics
 
             Sprite2D sprite = new Sprite2D()
             {
-                Name = node.Id,
+                Name = node.FullId,
                 Texture = GD.Load<Texture2D>("res://assets/background_center.png"),
                 Position = Vector2.Zero,
                 GlobalPosition = node.Position,
                 Scale = new Vector2(0.25f, 0.25f)
             };
 
+            node.Sprite = sprite;
             nodesContainer.AddChild(sprite);
+        }
+
+        public void SelectNodePair(MapNode[] node)
+        {
+            if (node[0] != null) node[0].Sprite.Modulate = Color.FromHtml(SelectedNodeColor);
+            if (node[1] != null) node[1].Sprite.Modulate = Color.FromHtml(SecondSelectedNodeColor);
+        }
+
+        public void DeselectNode(MapNode node)
+        {
+            if (node == null || node.Sprite == null) return;
+            node.Sprite.Modulate = Color.FromHtml(LineColor);
         }
 
         // public void LoadStations()

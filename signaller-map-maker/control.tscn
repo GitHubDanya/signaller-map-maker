@@ -1,15 +1,29 @@
 [gd_scene format=3 uid="uid://ha462s1nkmi6"]
 
 [ext_resource type="Script" uid="uid://btfdkid6dai37" path="res://scripts/editor/Editor.cs" id="1_0fbet"]
+[ext_resource type="Script" uid="uid://b1ixmyytnianc" path="res://scripts/ui/UiController.cs" id="2_62e2m"]
 
-[node name="CanvasLayer" type="CanvasLayer" unique_id=1698487867]
+[node name="Editor" type="CanvasLayer" unique_id=1698487867]
 follow_viewport_enabled = true
 script = ExtResource("1_0fbet")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=513475418]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=513475418 node_paths=PackedStringArray("nodeLabel", "nodePrefixField", "nodeUpdateButton", "nodeDeleteButton", "edgeSelectedLabel", "edgeFromLabel", "edgeToLabel", "edgeCreateButton", "edgeIsStumpCheckbox", "edgeLength", "edgeSpeedLimit", "edgeDeleteButton")]
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
+script = ExtResource("2_62e2m")
+nodeLabel = NodePath("MarginContainer/NodeProperties/NodePanel/SelectedNode")
+nodePrefixField = NodePath("MarginContainer/NodeProperties/NodePanel/NodePrefix")
+nodeUpdateButton = NodePath("MarginContainer/NodeProperties/NodePanel/HBoxContainer/Update")
+nodeDeleteButton = NodePath("MarginContainer/NodeProperties/NodePanel/HBoxContainer/DeleteButton")
+edgeSelectedLabel = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/SelectedEdge")
+edgeFromLabel = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel/FromNode")
+edgeToLabel = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel/ToNode")
+edgeCreateButton = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/CreateButton")
+edgeIsStumpCheckbox = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/IsStump")
+edgeLength = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties/Length")
+edgeSpeedLimit = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties/Speedlimit")
+edgeDeleteButton = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/DeleteButton")
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=57261731]
 layout_mode = 2
@@ -52,9 +66,20 @@ theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_font_sizes/font_size = 12
 placeholder_text = "prefix"
 
-[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=586845470]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=637552739]
+layout_mode = 2
+
+[node name="Update" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel/HBoxContainer" unique_id=318586139]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Update
+"
+
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel/HBoxContainer" unique_id=586845470]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98466235, 0.49880713, 0.43196452, 1)
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 12
 text = "Delete"
@@ -70,11 +95,14 @@ text = "Edge"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SelectionPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=1343817665]
+[node name="Contents" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=1707631370]
+layout_mode = 2
+
+[node name="LeftSide" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents" unique_id=1026234114]
 layout_mode = 2
 alignment = 1
 
-[node name="SelectedNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/SelectionPanel" unique_id=794037494]
+[node name="SelectedEdge" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=794037494]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7624033, 0.76240385, 0.76240337, 1)
 theme_override_font_sizes/font_size = 12
@@ -82,35 +110,68 @@ text = "NaN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/SelectionPanel" unique_id=1371821009]
+[node name="Spacer2" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=1199155813]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/SelectionPanel" unique_id=1219451770]
+[node name="TargetNodesPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=485093232]
+layout_mode = 2
+
+[node name="FromNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel" unique_id=1691773263]
+custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 12
-text = "Delete"
+text = "FROM"
+horizontal_alignment = 1
 
-[node name="TargetNodesPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=485093232]
-layout_mode = 2
-
-[node name="NodeFrom" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/TargetNodesPanel" unique_id=1650942176]
+[node name="ToNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel" unique_id=1483006000]
+custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
-theme_override_font_sizes/font_size = 12
-placeholder_text = "from"
+text = "TO"
+horizontal_alignment = 1
 
-[node name="NodeTo" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/TargetNodesPanel" unique_id=753619105]
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=1898139747]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
-theme_override_font_sizes/font_size = 12
-placeholder_text = "to"
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="CreateButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=859179607]
+[node name="CreateButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=859179607]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 12
 text = "Create"
+
+[node name="RightSide" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents" unique_id=1205717839]
+layout_mode = 2
+
+[node name="IsStump" type="CheckBox" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide" unique_id=1602899603]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_font_sizes/font_size = 9
+text = "Stump?"
+
+[node name="Properties" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide" unique_id=18943648]
+layout_mode = 2
+
+[node name="Length" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties" unique_id=2022982935]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_font_sizes/font_size = 12
+placeholder_text = "Length"
+
+[node name="Speedlimit" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties" unique_id=803371535]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_font_sizes/font_size = 12
+placeholder_text = "Speed Limit"
+
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide" unique_id=1219451770]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9843137, 0.49803922, 0.43137255, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Delete"

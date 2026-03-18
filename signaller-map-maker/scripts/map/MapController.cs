@@ -16,7 +16,7 @@ namespace signallerMap.Scripts.Map
         private Vector2 _mapDragStartMousePos;
         private Vector2 _mapDragStartMapPos;
 
-        public override void _Input(InputEvent @event)
+        public override void _UnhandledInput(InputEvent @event)
         {
             HandleDragging(@event);
             HandleZooming(@event);

@@ -10,12 +10,12 @@ namespace signallerMap.Scripts
 {
     internal partial class MapNode : Resource
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string FullId { get; set; }
         public Vector2 Position { get; set; }
         public List<MapEdge> IncomingEdges = new List<MapEdge>();
         public List<MapEdge> OutgoingEdges = new List<MapEdge>();
         public List<MapSignal> Signals = new List<MapSignal>();
-        public Circle Sprite { get; set; }
+        public Sprite2D Sprite { get; set; }
     }
 }

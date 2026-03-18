@@ -5,12 +5,14 @@
 [ext_resource type="Script" uid="uid://cycrb2wqsmuw4" path="res://scripts/map/MapGrapher.cs" id="1_p5pve"]
 [ext_resource type="Texture2D" uid="uid://bicifofs7s4ow" path="res://assets/background_center.png" id="2_e0an3"]
 [ext_resource type="Script" uid="uid://3axp3mpa1duc" path="res://scripts/map/MapController.cs" id="4_urblq"]
-[ext_resource type="Script" uid="uid://bs1c8otx62of3" path="res://scripts/input/DrawingHandler.cs" id="5_urblq"]
+[ext_resource type="Script" uid="uid://3xt2g2aourjd" path="res://scripts/input/InputHandler.cs" id="6_iw27f"]
 
 [node name="Map" type="Node2D" unique_id=1622036391]
 
-[node name="CanvasLayer" parent="." unique_id=1698487867 node_paths=PackedStringArray("mapGrapher") instance=ExtResource("1_iw27f")]
+[node name="Editor" parent="." unique_id=1698487867 node_paths=PackedStringArray("mapGrapher", "nodeContainer", "edgeContainer") instance=ExtResource("1_iw27f")]
 mapGrapher = NodePath("../MapGrapher")
+nodeContainer = NodePath("../MapGrapher/NodeContainer")
+edgeContainer = NodePath("../MapGrapher/EdgeContainer")
 
 [node name="MapGrapher" type="Node2D" parent="." unique_id=92932744]
 script = ExtResource("1_p5pve")
@@ -25,7 +27,6 @@ region_enabled = true
 region_rect = Rect2(0, 0, 20000, 20000)
 
 [node name="EdgeContainer" type="Node2D" parent="MapGrapher" unique_id=606151747]
-scale = Vector2(6.666667e-05, 6.666667e-05)
 
 [node name="NodeContainer" type="Node2D" parent="MapGrapher" unique_id=1447335525]
 
@@ -39,4 +40,4 @@ map = NodePath("../MapGrapher")
 
 [node name="DrawingHandler" type="Node2D" parent="." unique_id=154570188]
 position = Vector2(-10000, -10000)
-script = ExtResource("5_urblq")
+script = ExtResource("6_iw27f")

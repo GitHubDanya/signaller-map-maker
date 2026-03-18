@@ -1,24 +1,25 @@
 using Godot;
 using signallerMap.Scripts.Data;
 using signallerMap.Scripts.Graphics;
+using signallerMap.Scripts.editor;
 using System;
 
 namespace signallerMap.Scripts.Input 
 {
-    public partial class DrawingHandler : Node2D
+    public partial class InputHandler : Node2D
     {
+        Editor editor;
         MapGrapher mapGrapher;
-        Node2D nodesContainer;
         private Vector2 _clickStartPosition;
         private float _clickThreshold = 10.0f; // If moved more than this, it's a drag, not a draw
 
         public override void _Ready()
         {
             mapGrapher = GetNode<MapGrapher>("/root/Map/MapGrapher");
-            nodesContainer = mapGrapher.GetNode<Node2D>("NodeContainer");
+            editor = GetNode<Editor>("/root/Map/Editor");
         }
 
-        public override void _Input(InputEvent @event)
+        public override void _UnhandledInput(InputEvent @event)
         {
             HandleInput(@event);
         }
@@ -42,6 +43,10 @@ namespace signallerMap.Scripts.Input
                     }
                 }
             }
+            else if (@event.IsActionPressed("undo"))
+            {
+                
+            }
         }
 
         private void SpawnNode()
@@ -51,18 +56,7 @@ namespace signallerMap.Scripts.Input
                 (float)Math.Round(mousePos.X / 25f) * 25f,
                 (float)Math.Round(mousePos.Y / 25f) * 25f
             );
-
-            string id = MapData.Nodes.Count.ToString("D3");
-
-            MapNode node = new()
-            {
-                Id = id,
-                Position = nodePos
-            };
-
-            
-
-            
+            editor.NodeClickEvent(nodePos);
         }
     }
 }
