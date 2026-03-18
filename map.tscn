@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://do0jwjnbi3dq6"]
+
+[ext_resource type="Texture2D" uid="uid://ddd8jw0yofmv0" path="res://assets/backgroundGrid.png" id="1_c7s6e"]
+[ext_resource type="PackedScene" uid="uid://ha462s1nkmi6" path="res://control.tscn" id="1_iw27f"]
+[ext_resource type="Script" uid="uid://cycrb2wqsmuw4" path="res://scripts/map/MapGrapher.cs" id="1_p5pve"]
+[ext_resource type="Texture2D" uid="uid://bicifofs7s4ow" path="res://assets/background_center.png" id="2_e0an3"]
+[ext_resource type="Script" uid="uid://3axp3mpa1duc" path="res://scripts/map/MapController.cs" id="4_urblq"]
+[ext_resource type="Script" uid="uid://bs1c8otx62of3" path="res://scripts/input/DrawingHandler.cs" id="5_urblq"]
+
+[node name="Map" type="Node2D" unique_id=1622036391]
+
+[node name="CanvasLayer" parent="." unique_id=1698487867 node_paths=PackedStringArray("mapGrapher") instance=ExtResource("1_iw27f")]
+mapGrapher = NodePath("../MapGrapher")
+
+[node name="MapGrapher" type="Node2D" parent="." unique_id=92932744]
+script = ExtResource("1_p5pve")
+
+[node name="Sprite2D" type="Sprite2D" parent="MapGrapher" unique_id=2014807369]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-10000, -10000)
+texture = ExtResource("1_c7s6e")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 20000, 20000)
+
+[node name="EdgeContainer" type="Node2D" parent="MapGrapher" unique_id=606151747]
+scale = Vector2(6.666667e-05, 6.666667e-05)
+
+[node name="NodeContainer" type="Node2D" parent="MapGrapher" unique_id=1447335525]
+
+[node name="MapCenter" type="Sprite2D" parent="MapGrapher" unique_id=1131105048]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_e0an3")
+
+[node name="MapController" type="Node2D" parent="." unique_id=1437794987 node_paths=PackedStringArray("map")]
+script = ExtResource("4_urblq")
+map = NodePath("../MapGrapher")
+
+[node name="DrawingHandler" type="Node2D" parent="." unique_id=154570188]
+position = Vector2(-10000, -10000)
+script = ExtResource("5_urblq")

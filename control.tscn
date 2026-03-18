@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://ha462s1nkmi6"]
+
+[ext_resource type="Script" uid="uid://btfdkid6dai37" path="res://scripts/editor/Editor.cs" id="1_0fbet"]
+
+[node name="CanvasLayer" type="CanvasLayer" unique_id=1698487867]
+follow_viewport_enabled = true
+script = ExtResource("1_0fbet")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=513475418]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=57261731]
+layout_mode = 2
+theme_override_constants/margin_left = 7
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 7
+theme_override_constants/margin_bottom = 7
+
+[node name="NodeProperties" type="HBoxContainer" parent="PanelContainer/MarginContainer" unique_id=917989425]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NodePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties" unique_id=391654261]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=2117601094]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
+theme_override_font_sizes/font_size = 16
+text = "Node"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=1853396015]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SelectedNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=1334852025]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7624033, 0.76240385, 0.76240337, 1)
+theme_override_font_sizes/font_size = 12
+text = "NaN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NodePrefix" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=256449856]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_font_sizes/font_size = 12
+placeholder_text = "prefix"
+
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=586845470]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Delete"
+
+[node name="EdgePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties" unique_id=2109431056]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=942084918]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
+theme_override_font_sizes/font_size = 16
+text = "Edge"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=1343817665]
+layout_mode = 2
+alignment = 1
+
+[node name="SelectedNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/SelectionPanel" unique_id=794037494]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7624033, 0.76240385, 0.76240337, 1)
+theme_override_font_sizes/font_size = 12
+text = "NaN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/SelectionPanel" unique_id=1371821009]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/SelectionPanel" unique_id=1219451770]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Delete"
+
+[node name="TargetNodesPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=485093232]
+layout_mode = 2
+
+[node name="NodeFrom" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/TargetNodesPanel" unique_id=1650942176]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_font_sizes/font_size = 12
+placeholder_text = "from"
+
+[node name="NodeTo" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/TargetNodesPanel" unique_id=753619105]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_font_sizes/font_size = 12
+placeholder_text = "to"
+
+[node name="CreateButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=859179607]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Create"
