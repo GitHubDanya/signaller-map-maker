@@ -13,8 +13,9 @@ namespace signallerMap.Scripts.Editor
         public MapNode SelectedNode { get; set; }
         public MapEdge SelectedEdge { get; set; }
 
-        public void CreateNode(MapNode node)
+        public void CreateNode(string id, Vector2 position)
         {
+            
             if (nodeContainer.HasNode(node.Id)) return;
             MapData.Nodes.Add(node);
             mapGrapher.DrawNode(node);
