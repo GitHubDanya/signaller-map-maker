@@ -1,4 +1,5 @@
 using Godot;
+using signallerMap.Scripts.Data;
 using signallerMap.Scripts.editor;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,11 @@ namespace signallerMap.Scripts.UI
         [Export] private LineEdit edgeLength { get; set; }
         [Export] private LineEdit edgeSpeedLimit { get; set; }
         [Export] private Button edgeDeleteButton { get; set; }
+        [Export] private Button jsonLoadButton { get; set; }
+        [Export] private Button jsonSaveButton { get; set; }
 
         private Editor _editor;
+        private FileManager _fileManager;
 
         public override void _Process(double delta)
         {
@@ -41,8 +45,11 @@ namespace signallerMap.Scripts.UI
             edgeLength.TextSubmitted += uiEdgeLengthFieldChanged;
             edgeSpeedLimit.TextSubmitted += uiEdgeSpeedFieldChanged;
             edgeDeleteButton.Pressed += uiEdgeDeleteButtonPressed;
+            jsonLoadButton.Pressed += uiJsonLoadButtonPressed;
+            jsonSaveButton.Pressed += uiJsonSaveButtonPressed;
 
             _editor = GetNode<Editor>("/root/Map/Editor");
+            _fileManager = GetNode<FileManager>("/root/Map/FileManager");
         }
 
         private void uiNodePrefixFieldChanged(string text)
@@ -62,6 +69,8 @@ namespace signallerMap.Scripts.UI
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeDeleteButtonPressed()
         { _editor.DeleteEdge(); }
+        private void uiJsonLoadButtonPressed() { _fileManager.LoadData(); }
+        private void uiJsonSaveButtonPressed() { _fileManager.SaveData(); }
         private void UpdateUi()
         {
             nodeLabel.Text = _editor.SelectedNodes[0]?.FullId ?? "NaN";

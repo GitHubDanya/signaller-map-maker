@@ -59,6 +59,7 @@ namespace signallerMap.Scripts.Graphics
 
             ColorRect line = new ColorRect();
             line.Color = Color.FromHtml(LineColor);
+            line.ZIndex = 1;
 
             Vector2 startPos = edge.From.Position;
             Vector2 endPos = edge.To.Position;
@@ -74,7 +75,7 @@ namespace signallerMap.Scripts.Graphics
             line.Position = startPos - new Vector2(0, LineWidth / 2f);
             line.Rotation = angle;
 
-            line.MouseFilter = Control.MouseFilterEnum.Stop;
+            line.MouseFilter = Control.MouseFilterEnum.Pass;
             line.GuiInput += (inputEvent) =>
             {
                 if (inputEvent is InputEventMouseButton mouse && mouse.Pressed)
@@ -156,17 +157,34 @@ namespace signallerMap.Scripts.Graphics
                 Texture = GD.Load<Texture2D>("res://assets/background_center.png"),
                 Position = Vector2.Zero,
                 GlobalPosition = node.Position,
-                Scale = new Vector2(0.25f, 0.25f)
+                Scale = new Vector2(0.35f, 0.35f),
+                ZIndex = 10
+            };
+            node.Sprite = sprite;
+
+            var area = new Area2D();
+            area.ZIndex = 10;
+            var collision = new CollisionShape2D
+            {
+                Shape = new RectangleShape2D { Size = sprite.Texture.GetSize() }
             };
 
-            node.Sprite = sprite;
+            area.AddChild(collision);
+            sprite.AddChild(area);
+
+            area.InputEvent += (viewport, @event, shapeIdx) =>
+            {
+                if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
+                    _editor.SelectNode(node);
+            };
+
             nodesContainer.AddChild(sprite);
         }
 
         public void SelectNodePair(MapNode[] node)
         {
-            if (node[0] != null) node[0].Sprite.Modulate = Color.FromHtml(SelectedNodeColor);
-            if (node[1] != null) node[1].Sprite.Modulate = Color.FromHtml(SecondSelectedNodeColor);
+            if (node[0]?.Sprite != null) node[0].Sprite.Modulate = Color.FromHtml(SelectedNodeColor);
+            if (node[1]?.Sprite != null) node[1].Sprite.Modulate = Color.FromHtml(SecondSelectedNodeColor);
         }
 
         public void DeselectNode(MapNode node)
