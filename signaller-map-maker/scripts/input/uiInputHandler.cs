@@ -25,6 +25,10 @@ namespace signallerMap.Scripts.Input
                 uiDeleteEdgeButton.EmitSignal(Button.SignalName.Pressed);
             else if (@event.IsActionPressed("delete_node"))
                 uiDeleteNodeButton.EmitSignal(Button.SignalName.Pressed);
+            else if (@event.IsActionPressed("undo"))
+                CommandManager.Undo();
+            else if (@event.IsActionPressed("redo"))
+                CommandManager.Redo();
         }
     }
 }

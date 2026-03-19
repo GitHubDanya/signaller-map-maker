@@ -25,7 +25,7 @@ namespace signallerMap.Scripts.Data
         {
             return new()
             {
-                id = node.FullId,
+                id = node.Id,
                 pos = new[] { node.Position.X, node.Position.Y }
             };
         }
@@ -34,7 +34,7 @@ namespace signallerMap.Scripts.Data
         {
             return new()
             {
-                FullId = jsonNode.id,
+                Id = jsonNode.id,
                 Position = new Vector2(jsonNode.pos[0], jsonNode.pos[1])
             };
         }
@@ -63,8 +63,8 @@ namespace signallerMap.Scripts.Data
             {
                 id = edge.Id,
                 station_id = edge.StationId ?? string.Empty,
-                from = edge.From.FullId,
-                to = edge.To.FullId,
+                from = edge.From.Id,
+                to = edge.To.Id,
                 length = edge.Length,
                 max_speed = edge.MaxSpeed
             };
@@ -72,8 +72,8 @@ namespace signallerMap.Scripts.Data
 
         private MapEdge JSONToMapEdge(JsonMapEdge jsonEdge)
         {
-            MapNode from = MapData.Nodes.FirstOrDefault(n => n.FullId == jsonEdge.from);
-            MapNode to = MapData.Nodes.FirstOrDefault(n => n.FullId == jsonEdge.to);
+            MapNode from = MapData.Nodes.FirstOrDefault(n => n.Id == jsonEdge.from);
+            MapNode to = MapData.Nodes.FirstOrDefault(n => n.Id == jsonEdge.to);
             if (from == null || to == null) return null;
             return new ()
             {

@@ -42,7 +42,7 @@ namespace signallerMap.Scripts.editor
 
         public void CreateNode(MapNode node)
         {
-            if (nodeContainer.HasNode(node.FullId)) return;
+            if (nodeContainer.HasNode(node.Id)) return;
             
             MapData.Nodes.Add(node);
             mapGrapher.DrawNode(node);
@@ -58,12 +58,14 @@ namespace signallerMap.Scripts.editor
 
             MapNode node = new()
             {
-                Id = NodeIds[NodePrefix],
-                FullId = id,
+                Serial = NodeIds[NodePrefix],
+                Prefix = NodePrefix,
+                Id = id,
                 Position = position
             };
 
-            CreateNode(node);
+            var command = new CreateNodeCommand(this, node);
+            CommandManager.ExecuteCommand(command);
         }
 
         public int RefreshNodeID()
@@ -90,22 +92,23 @@ namespace signallerMap.Scripts.editor
 
         public void UpdateNode(string id = "")
         {
-            if (string.IsNullOrEmpty(id)) id = SelectedNodes[0].FullId;
+            if (string.IsNullOrEmpty(id)) id = SelectedNodes[0].Id;
         }
 
-        public void DeleteNode(string id = "")
+        public void DeleteNode(string id = "", bool isUndo = false)
         {
             if (string.IsNullOrEmpty(id))
             {
                 if (SelectedNodes[0] == null) return;
-                id = SelectedNodes[0].FullId;
+                id = SelectedNodes[0].Id;
             }
-            MapNode node = MapData.Nodes.FirstOrDefault(n => n.FullId == id);
+            MapNode node = MapData.Nodes.FirstOrDefault(n => n.Id == id);
             if (node == null) return;
-
+            
+            if (isUndo) NodeIds[node.Prefix]--;
             while (node.IncomingEdges.Count > 0) DeleteEdge(node.IncomingEdges[0].Id);
             while (node.OutgoingEdges.Count > 0) DeleteEdge(node.OutgoingEdges[0].Id);
-            
+
             if (GodotObject.IsInstanceValid(node.Sprite))
                 node.Sprite.QueueFree();
             MapData.Nodes.Remove(node);
@@ -129,8 +132,8 @@ namespace signallerMap.Scripts.editor
 
         public void CreateEdge(MapNode from, MapNode to, int length, int maxSpeed, bool stumps = false)
         {
-            int fromId = from.Id;
-            int toId = to.Id;
+            int fromId = from.Serial;
+            int toId = to.Serial;
             string id = NodePrefix + Math.Min(fromId, toId) + Math.Max(fromId, toId);
 
             MapEdge edge = new MapEdge()
@@ -142,7 +145,8 @@ namespace signallerMap.Scripts.editor
                 MaxSpeed = maxSpeed
             };
 
-            CreateEdge(edge);
+            var command = new CreateEdgeCommand(this, edge);
+            CommandManager.ExecuteCommand(command);
         }
 
         public void SelectEdge(MapEdge edge)
@@ -160,7 +164,7 @@ namespace signallerMap.Scripts.editor
             SelectedEdge = null;
         }
 
-        public void DeleteEdge(string id = "")
+        public void DeleteEdge(string id = "", bool isUndo = false)
         {
             if (string.IsNullOrEmpty(id) && SelectedEdge != null) id = SelectedEdge.Id;
             MapEdge edge = MapData.Edges.FirstOrDefault(e => e.Id == id);
@@ -182,7 +186,7 @@ namespace signallerMap.Scripts.editor
         public void CleanMap()
         {
             foreach (MapEdge edge in MapData.Edges.ToList()) { DeleteEdge(edge.Id); }
-            foreach (MapNode node in MapData.Nodes.ToList()) { DeleteNode(node.FullId); }
+            foreach (MapNode node in MapData.Nodes.ToList()) { DeleteNode(node.Id); }
             initialize();
         }
     }

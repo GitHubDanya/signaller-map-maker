@@ -28,7 +28,7 @@ namespace signallerMap.Scripts.Graphics
             nodesContainer = GetNode<Node2D>("NodeContainer");
             _editor = GetNode<Editor>("/root/Map/Editor");
         }
-
+        
         public void DrawMap()
         {
             LoadNodes();
@@ -153,7 +153,7 @@ namespace signallerMap.Scripts.Graphics
 
             Sprite2D sprite = new Sprite2D()
             {
-                Name = node.FullId,
+                Name = node.Id,
                 Texture = GD.Load<Texture2D>("res://assets/background_center.png"),
                 Position = Vector2.Zero,
                 GlobalPosition = node.Position,
@@ -191,6 +191,11 @@ namespace signallerMap.Scripts.Graphics
         {
             if (node == null || node.Sprite == null) return;
             node.Sprite.Modulate = Color.FromHtml(LineColor);
+        }
+        
+        public void Undo()
+        {
+            
         }
 
         // public void LoadStations()
@@ -410,4 +415,5 @@ namespace signallerMap.Scripts.Graphics
     {
         public MapEdge Data { get; set; }
     }
+
 }

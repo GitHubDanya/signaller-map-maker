@@ -71,6 +71,9 @@ namespace signallerMap.Scripts.Data
 
         private void SaveJSONToPath(string path)
         {
+            jsonMapNodes = parser.ConvertToJsonMapNodes(MapData.Nodes);
+            jsonMapEdges = parser.ConvertToJsonMapEdges(MapData.Edges);
+
             var data = new { nodes = jsonMapNodes, edges = jsonMapEdges };
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = JsonSerializer.Serialize(data, options);
@@ -82,7 +85,12 @@ namespace signallerMap.Scripts.Data
             }
         }
 
-        private void LoadMapFromJSON(string path)
+        private void SaveMapToJSON()
+        {
+            
+        }
+
+        private async void LoadMapFromJSON(string path)
         {
             using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
@@ -96,6 +104,7 @@ namespace signallerMap.Scripts.Data
             JsonDocument mapdata = JsonDocument.Parse(jsonContent);
 
             _editor.CleanMap();
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
             Callable.From(() =>
             {
@@ -104,6 +113,8 @@ namespace signallerMap.Scripts.Data
                 List<MapEdge> edges = parser.ConvertToMapEdges(loadJsonEdgesFromData(mapdata));
                 foreach (MapEdge edge in edges) _editor.CreateEdge(edge);
             }).CallDeferred();
+
+            CommandManager.Clear();
         }
 
         private List<JsonMapNode> loadJsonNodesFromData(JsonDocument mapdata)

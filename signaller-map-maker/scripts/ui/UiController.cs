@@ -57,7 +57,7 @@ namespace signallerMap.Scripts.UI
         private void uiNodeUpdateButtonPressed()
         { _editor.UpdateNode(); }
         private void uiNodeDeleteButtonPressed()
-        { _editor.DeleteNode(); }
+        { CommandManager.ExecuteCommand(new DeleteNodeCommand(_editor, null)); }
         private void uiEdgeCreateButtonPressed()
         { if (_editor.SelectedNodes[0] == null || _editor.SelectedNodes[1] == null) return;
           if (int.TryParse(edgeLength.Text, out int el) == false || int.TryParse(edgeSpeedLimit.Text, out int esl) == false) return;
@@ -68,14 +68,14 @@ namespace signallerMap.Scripts.UI
         private void uiEdgeSpeedFieldChanged(string text)
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeDeleteButtonPressed()
-        { _editor.DeleteEdge(); }
+        { CommandManager.ExecuteCommand(new DeleteEdgeCommand(_editor, null)); }
         private void uiJsonLoadButtonPressed() { _fileManager.LoadData(); }
         private void uiJsonSaveButtonPressed() { _fileManager.SaveData(); }
         private void UpdateUi()
         {
-            nodeLabel.Text = _editor.SelectedNodes[0]?.FullId ?? "NaN";
-            edgeFromLabel.Text = _editor.SelectedNodes[0]?.FullId ?? "NaN";
-            edgeToLabel.Text = _editor.SelectedNodes[1]?.FullId ?? "NaN";
+            nodeLabel.Text = _editor.SelectedNodes[0]?.Id ?? "NaN";
+            edgeFromLabel.Text = _editor.SelectedNodes[0]?.Id ?? "NaN";
+            edgeToLabel.Text = _editor.SelectedNodes[1]?.Id ?? "NaN";
             edgeSelectedLabel.Text = _editor.SelectedEdge?.Id ?? "NaN";
         }
     }
