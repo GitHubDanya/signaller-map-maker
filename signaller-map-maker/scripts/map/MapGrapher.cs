@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using signallerMap.Scripts.Data;
+using signallerMap.Scripts.editor;
 
 namespace signallerMap.Scripts.Graphics
 {
@@ -12,17 +13,20 @@ namespace signallerMap.Scripts.Graphics
     {
         private Node2D edgesContainer;
         private Node2D nodesContainer;
+        private Editor _editor;
         public const float LineWidth = 3.5f;
         public const int StumpLength = 10;
         public const int SignalRadius = 5;
         public const string LineColor = "FFFFFF";
         public const string SelectedNodeColor = "ffce1c";
         public const string SecondSelectedNodeColor = "ffde66";
+        public const string SelectedEdgeColor = "fcb653";
 
         public override void _Ready()
         {
             edgesContainer = GetNode<Node2D>("EdgeContainer");
             nodesContainer = GetNode<Node2D>("NodeContainer");
+            _editor = GetNode<Editor>("/root/Map/Editor");
         }
 
         public void DrawMap()
@@ -53,17 +57,49 @@ namespace signallerMap.Scripts.Graphics
         {
             if (edge.From == null || edge.To == null) return;
 
-            UiMapEdge line = new UiMapEdge();
-            line.Width = LineWidth;
-            line.DefaultColor = Color.FromHtml(LineColor);
-            line.Antialiased = true;
-            line.Data = edge;
+            ColorRect line = new ColorRect();
+            line.Color = Color.FromHtml(LineColor);
 
-            line.AddPoint(edge.From.Position);
-            line.AddPoint(edge.To.Position);
+            Vector2 startPos = edge.From.Position;
+            Vector2 endPos = edge.To.Position;
+            Vector2 direction = endPos - startPos;
+
+            float length = direction.Length();
+            float angle = direction.Angle();
+
+            line.Size = new Vector2(length, LineWidth);
+
+            line.PivotOffset = new Vector2(0, LineWidth / 2f);
+
+            line.Position = startPos - new Vector2(0, LineWidth / 2f);
+            line.Rotation = angle;
+
+            line.MouseFilter = Control.MouseFilterEnum.Stop;
+            line.GuiInput += (inputEvent) =>
+            {
+                if (inputEvent is InputEventMouseButton mouse && mouse.Pressed)
+                {
+                    if (mouse.ButtonIndex == MouseButton.Left)
+                    {
+                        _editor.SelectEdge(edge);
+                    }
+                }
+            };
 
             edge.Sprite = line;
             edgesContainer.AddChild(line);
+        }
+
+        public void SelectEdge(MapEdge edge)
+        {
+            if (edge == null || edge.Sprite == null) return;
+            edge.Sprite.Color = Color.FromHtml(SelectedEdgeColor);
+        }
+
+        public void DeselectEdge(MapEdge edge)
+        {
+            if (edge == null || edge.Sprite == null) return;
+            edge.Sprite.Color = Color.FromHtml(LineColor);
         }
 
         public void LoadStumps()

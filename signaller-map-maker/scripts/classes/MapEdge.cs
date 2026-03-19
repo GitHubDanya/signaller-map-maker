@@ -15,7 +15,7 @@ namespace signallerMap.Scripts
         public MapNode From { get; set; }
         public MapNode To { get; set; }
         public MapStationPlatform Platform { get; set; }
-        public Line2D Sprite { get; set; }
+        public ColorRect Sprite { get; set; }
         public double Length { get; set; }
         public double MaxSpeed { get; set; }
     }

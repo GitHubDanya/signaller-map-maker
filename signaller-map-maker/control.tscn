@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://btfdkid6dai37" path="res://scripts/editor/Editor.cs" id="1_0fbet"]
 [ext_resource type="Script" uid="uid://b1ixmyytnianc" path="res://scripts/ui/UiController.cs" id="2_62e2m"]
+[ext_resource type="Script" uid="uid://b3ex0b32hka5q" path="res://scripts/input/uiInputHandler.cs" id="3_qtu10"]
 
 [node name="Editor" type="CanvasLayer" unique_id=1698487867]
 follow_viewport_enabled = true
@@ -175,3 +176,9 @@ theme_override_colors/font_color = Color(0.9843137, 0.49803922, 0.43137255, 1)
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 12
 text = "Delete"
+
+[node name="InputHandler" type="Node2D" parent="." unique_id=329217872 node_paths=PackedStringArray("uiDeleteEdgeButton", "uiDeleteNodeButton", "uiCreateEdgeButton")]
+script = ExtResource("3_qtu10")
+uiDeleteEdgeButton = NodePath("../PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/DeleteButton")
+uiDeleteNodeButton = NodePath("../PanelContainer/MarginContainer/NodeProperties/NodePanel/HBoxContainer/DeleteButton")
+uiCreateEdgeButton = NodePath("../PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/CreateButton")

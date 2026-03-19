@@ -54,7 +54,7 @@ namespace signallerMap.Scripts.UI
         private void uiEdgeCreateButtonPressed()
         { if (_editor.SelectedNodes[0] == null || _editor.SelectedNodes[1] == null) return;
           if (int.TryParse(edgeLength.Text, out int el) == false || int.TryParse(edgeSpeedLimit.Text, out int esl) == false) return;
-          _editor.CreateEdge(_editor.SelectedNodes[0], _editor.SelectedNodes[1], el, esl); }
+          _editor.CreateEdge(_editor.SelectedNodes[0], _editor.SelectedNodes[1], el, esl, edgeIsStumpCheckbox.ButtonPressed); }
         private void uiEdgeStumpCheckboxToggled(bool state) {}
         private void uiEdgeLengthFieldChanged(string text)
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
@@ -62,13 +62,12 @@ namespace signallerMap.Scripts.UI
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeDeleteButtonPressed()
         { _editor.DeleteEdge(); }
-
-
         private void UpdateUi()
         {
             nodeLabel.Text = _editor.SelectedNodes[0]?.FullId ?? "NaN";
             edgeFromLabel.Text = _editor.SelectedNodes[0]?.FullId ?? "NaN";
             edgeToLabel.Text = _editor.SelectedNodes[1]?.FullId ?? "NaN";
+            edgeSelectedLabel.Text = _editor.SelectedEdge?.Id ?? "NaN";
         }
     }
 }

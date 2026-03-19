@@ -76,6 +76,9 @@ namespace signallerMap.Scripts.editor
             MapNode node = MapData.Nodes.FirstOrDefault(n => n.FullId == id);
             if (node == null) return;
 
+            foreach (MapEdge edge in node.IncomingEdges.ToList()) DeleteEdge(edge.Id);
+            foreach (MapEdge edge in node.OutgoingEdges.ToList()) DeleteEdge(edge.Id);
+
             node.Sprite.QueueFree();
             MapData.Nodes.Remove(node);
             node.Dispose();
@@ -85,7 +88,7 @@ namespace signallerMap.Scripts.editor
             SelectedNodes[1] = null;
         }
 
-        public void CreateEdge(MapNode from, MapNode to, int length, int maxSpeed)
+        public void CreateEdge(MapNode from, MapNode to, int length, int maxSpeed, bool stumps = false)
         {
             int fromId = from.Id;
             int toId = to.Id;
@@ -103,13 +106,40 @@ namespace signallerMap.Scripts.editor
             MapData.Edges.Add(edge);
             mapGrapher.DrawEdge(edge);
 
+            from.OutgoingEdges.Add(edge);
+            to.IncomingEdges.Add(edge);
+
+            SelectEdge(edge);
+        }
+
+        public void SelectEdge(MapEdge edge)
+        {
+            if (edge == null) return;
+            DeselectCurrentEdge();
             SelectedEdge = edge;
+            mapGrapher.SelectEdge(edge);
+        }
+
+        public void DeselectCurrentEdge()
+        {
+            if (SelectedEdge == null) return;
+            mapGrapher.DeselectEdge(SelectedEdge);
+            SelectedEdge = null;
         }
 
         public void DeleteEdge(string id = "")
         {
-            if (string.IsNullOrEmpty(id)) id = SelectedNodes[0].FullId;
-            
+            if (string.IsNullOrEmpty(id) && SelectedEdge != null) id = SelectedEdge.Id;
+            MapEdge edge = MapData.Edges.FirstOrDefault(e => e.Id == id);
+            if (edge == null) return;
+
+            if (edge == SelectedEdge) DeselectCurrentEdge();
+
+            edge.Sprite.QueueFree();
+            edge.To.IncomingEdges.Remove(edge);
+            edge.From.OutgoingEdges.Remove(edge);
+            MapData.Edges.Remove(edge);
+            edge.Dispose();
         }
     }
 }

@@ -38,6 +38,6 @@ texture = ExtResource("2_e0an3")
 script = ExtResource("4_urblq")
 map = NodePath("../MapGrapher")
 
-[node name="DrawingHandler" type="Node2D" parent="." unique_id=154570188]
+[node name="InputHandler" type="Node2D" parent="." unique_id=154570188]
 position = Vector2(-10000, -10000)
 script = ExtResource("6_iw27f")
