@@ -55,28 +55,30 @@ namespace signallerMap.Scripts.UI
         private void uiNodePrefixFieldChanged(string text)
         { _editor.NodePrefix = text.Length >= 2 ? text.Substring(0, 2) : text; }
         private void uiNodeUpdateButtonPressed()
-        { _editor.UpdateNode(); }
+        { _editor.FireUiEvent(EditorUiEvent.NodeUpdateButtonPressed); }
         private void uiNodeDeleteButtonPressed()
-        { CommandManager.ExecuteCommand(new DeleteNodeCommand(_editor, null)); }
+        { _editor.FireUiEvent(EditorUiEvent.NodeDeleteButtonPressed); }
         private void uiEdgeCreateButtonPressed()
-        { if (_editor.SelectedNodes[0] == null || _editor.SelectedNodes[1] == null) return;
-          if (int.TryParse(edgeLength.Text, out int el) == false || int.TryParse(edgeSpeedLimit.Text, out int esl) == false) return;
-          _editor.CreateEdge(_editor.SelectedNodes[0], _editor.SelectedNodes[1], el, esl, edgeIsStumpCheckbox.ButtonPressed); }
+        { _editor.FireUiEvent(EditorUiEvent.EdgeCreateButtonPressed,
+            new EditorUiCreateEdgeArgs()
+            { EdgeLength = edgeLength.Text,
+            EdgeSpeed = edgeSpeedLimit.Text,
+            IsStump = edgeIsStumpCheckbox.ButtonPressed }); }
         private void uiEdgeStumpCheckboxToggled(bool state) {}
         private void uiEdgeLengthFieldChanged(string text)
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeSpeedFieldChanged(string text)
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeDeleteButtonPressed()
-        { CommandManager.ExecuteCommand(new DeleteEdgeCommand(_editor, null)); }
+        { _editor.FireUiEvent(EditorUiEvent.EdgeDeleteButtonPressed); }
         private void uiJsonLoadButtonPressed() { _fileManager.LoadData(); }
         private void uiJsonSaveButtonPressed() { _fileManager.SaveData(); }
         private void UpdateUi()
         {
             nodeLabel.Text = _editor.SelectedNodes[0]?.Id ?? "NaN";
             edgeFromLabel.Text = _editor.SelectedNodes[0]?.Id ?? "NaN";
+            edgeSelectedLabel.Text = _editor.SelectedEdges[0]?.Id ?? "NaN";
             edgeToLabel.Text = _editor.SelectedNodes[1]?.Id ?? "NaN";
-            edgeSelectedLabel.Text = _editor.SelectedEdge?.Id ?? "NaN";
         }
     }
 }

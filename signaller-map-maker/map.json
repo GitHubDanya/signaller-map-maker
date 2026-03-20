@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "XX1",
+      "pos": [
+        600,
+        300
+      ]
+    },
+    {
+      "id": "XX2",
+      "pos": [
+        700,
+        300
+      ]
+    },
+    {
+      "id": "XX3",
+      "pos": [
+        800,
+        200
+      ]
+    },
+    {
+      "id": "XX4",
+      "pos": [
+        800,
+        400
+      ]
+    },
+    {
+      "id": "XX5",
+      "pos": [
+        500,
+        200
+      ]
+    },
+    {
+      "id": "XX6",
+      "pos": [
+        500,
+        400
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "XX27",
+      "station_id": "",
+      "from": "XX1",
+      "to": "XX6",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX26",
+      "station_id": "",
+      "from": "XX1",
+      "to": "XX5",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX23",
+      "station_id": "",
+      "from": "XX2",
+      "to": "XX1",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX34",
+      "station_id": "",
+      "from": "XX3",
+      "to": "XX2",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX35",
+      "station_id": "",
+      "from": "XX4",
+      "to": "XX2",
+      "length": 123,
+      "max_speed": 123
+    }
+  ]
+}

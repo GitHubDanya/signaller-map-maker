@@ -2,6 +2,8 @@ using Godot;
 using Godot.NativeInterop;
 using System;
 using System.Collections.Generic;
+using signallerMap.Scripts.Data;
+using System.Linq;
 
 namespace signallerMap.Scripts.editor
 {
@@ -53,12 +55,16 @@ namespace signallerMap.Scripts.editor
         
         public void Execute()
         {
-            _editor.CreateNode(_node);
+            if (_editor.nodeContainer.HasNode(_node.Id)) return;
+            
+            MapData.Nodes.Add(_node);
+            _editor.mapGrapher.DrawNode(_node);
         }
 
         public void Undo()
         {
-            _editor.DeleteNode(_node.Id, isUndo: true);
+            _editor.DeleteNode(_node);
+            if (_editor.NodeIds.ContainsKey(_node.Prefix)) _editor.NodeIds[_node.Prefix]--;
         }
     }
     internal class DeleteNodeCommand : ICommand
@@ -69,13 +75,13 @@ namespace signallerMap.Scripts.editor
         public DeleteNodeCommand(Editor editor, MapNode mapNode)
         {
             _editor = editor;
-            _node = mapNode ?? _editor.SelectedNodes[0];
+            _node = mapNode;
         }
         
         public void Execute()
         {
             if (_node == null) return;
-            _editor.DeleteNode(_node.Id);
+            _editor.DeleteNode(_node);
         }
 
         public void Undo()
@@ -102,7 +108,7 @@ namespace signallerMap.Scripts.editor
 
         public void Undo()
         {
-            _editor.DeleteEdge(_edge.Id, isUndo: true);
+            _editor.DeleteEdge(_edge);
         }
     }
 
@@ -114,18 +120,44 @@ namespace signallerMap.Scripts.editor
         public DeleteEdgeCommand(Editor editor, MapEdge edge)
         {
             _editor = editor;
-            _edge = edge ?? editor.SelectedEdge;
+            _edge = edge;
         }
 
         public void Execute()
         {   
             if (_edge == null) return;
-            _editor.DeleteEdge(_edge.Id);
+            _editor.DeleteEdge(_edge);
         }
 
         public void Undo()
         {
             _editor.CreateEdge(_edge);
+        }
+    }
+
+    internal class CreateNodeMovementCommand : ICommand
+    {
+        private readonly Editor _editor;
+        private readonly MapNode _node;
+        private readonly MapNodeMovement _movement;
+        public bool IsValid => _node != null && _movement != null;
+        public CreateNodeMovementCommand(Editor editor, MapNode node, MapNodeMovement movement)
+        {
+            _editor = editor;
+            _node = node;
+            _movement = movement;
+        }
+
+        public void Execute()
+        {   
+            if (_node == null || _movement == null) return;
+            _node.Movements.Add(_movement);
+        }
+
+        public void Undo()
+        {
+            if (!_node.Movements.Contains(_movement)) return;
+            _node.Movements.Remove(_movement);
         }
     }
 

@@ -14,9 +14,19 @@ namespace signallerMap.Scripts
         public string Prefix { get; set; }
         public string Id { get; set; }
         public Vector2 Position { get; set; }
-        public List<MapEdge> IncomingEdges = new List<MapEdge>();
-        public List<MapEdge> OutgoingEdges = new List<MapEdge>();
+        public List<MapEdge> Edges = new List<MapEdge>();
         public List<MapSignal> Signals = new List<MapSignal>();
+        public List<MapNodeMovement> Movements = new();
         public Sprite2D Sprite { get; set; }
+    }
+
+    internal partial class MapNodeMovement
+    {
+        public MapEdge from;
+        public MapEdge to;
+        public MapNode GetNode()
+        {
+            return from.To.Id == to.From.Id ? from.To : from.From;
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://btfdkid6dai37" path="res://scripts/editor/Editor.cs" id="1_0fbet"]
 [ext_resource type="Script" uid="uid://b1ixmyytnianc" path="res://scripts/ui/UiController.cs" id="2_62e2m"]
-[ext_resource type="Script" uid="uid://b3ex0b32hka5q" path="res://scripts/input/uiInputHandler.cs" id="3_qtu10"]
+[ext_resource type="Script" uid="uid://80gq44fjdvka" path="res://scripts/input/UiShortcutHandler.cs" id="3_qtu10"]
 
 [node name="Editor" type="CanvasLayer" unique_id=1698487867]
 follow_viewport_enabled = true

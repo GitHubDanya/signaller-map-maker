@@ -10,48 +10,102 @@ namespace signallerMap.Scripts.editor
 {
     internal partial class Editor : CanvasLayer
     {
-        [Export] private MapGrapher mapGrapher;
-        [Export] private Node2D nodeContainer;
-        [Export] private Node2D edgeContainer;
+        // This class handles generic editor information and events.
+        // Editor actions and properties are located here.
+        // User inputted actions CAN NOT be directed here,
+        // instead use CommandManager.cs
+
+
+        [Export] public MapGrapher mapGrapher;
+        [Export] public Node2D nodeContainer;
+        [Export] public Node2D edgeContainer;
         public MapNode[] SelectedNodes = new MapNode[2];
-        public MapEdge SelectedEdge { get; set; }
+        public MapEdge[] SelectedEdges = new MapEdge[2];
+        public IEditorMode editorMode;
+
+        public Dictionary<string, int> NodeIds = new();
         public string NodePrefix { get; set; } = "XX";
-        private Dictionary<string, int> NodeIds = new();
 
         public override void _Ready()
         {
             nodeContainer = GetNode<Node2D>("/root/Map/MapGrapher/NodeContainer");
+            SetEditorMode(new BuildingMode(this));
         }
 
         private void initialize()
         {
-            NodeIds = new();
-            SelectedNodes = new MapNode[2];
-            SelectedEdge = null;
-            NodePrefix = "XX";
+            SetEditorMode(new BuildingMode(this));
         }
 
-        public void NodeClickEvent(Vector2 position)
+        public void SetEditorMode(IEditorMode mode)
         {
-            var childrenNodes = nodeContainer.GetChildren().Where(c => c is Sprite2D).Cast<Sprite2D>();
-            MapNode existingNode = MapData.Nodes.FirstOrDefault(n => n.Position.IsEqualApprox(position));
-            
-            if (existingNode != null) return;
-            else CreateNode(position);
+            editorMode = mode;
         }
 
+        
+
+        public void LMBClickEvent(Vector2 position)
+        {
+            editorMode.OnInputEvent(EditorInputEvent.LMBClick,
+            new EditorInputMouseClickArgs() { Position = position });
+        }
+
+        public void RMBClickEvent(Vector2 position)
+        {
+            editorMode.OnInputEvent(EditorInputEvent.RMBClick,
+            new EditorInputMouseClickArgs() { Position = position });
+        }
+
+        public void NodeClick(MapNode node)
+        {
+            editorMode.OnInputEvent(EditorInputEvent.NodeClick,
+            new EditorInputOnNodeArgs() { Node = node } );
+        }
+
+        public void EdgeClick(MapEdge edge)
+        {
+            editorMode.OnInputEvent(EditorInputEvent.EdgeClick,
+            new EditorInputOnEdgeArgs() { Edge = edge } );
+        }
+        
+        public void MouseEnterEdgeEvent(MapEdge edge)
+        {
+            editorMode.OnInputEvent(EditorInputEvent.EdgeHover,
+            new EditorInputOnEdgeArgs() { Edge = edge } );
+        }
+
+        public void MouseExitEdgeEvent(MapEdge edge)
+        {
+            editorMode.OnInputEvent(EditorInputEvent.EdgeUnhover,
+            new EditorInputOnEdgeArgs() { Edge = edge });
+        }
+
+        public void FireUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args = null) {
+            editorMode.OnUiEvent(uiEvent, args);
+        }
+
+        public int RefreshCurrentNodeID()
+        {
+            int latestId = 1;
+
+            if (!NodeIds.ContainsKey(NodePrefix)) return latestId;
+
+            foreach (KeyValuePair<string, int> kvp in NodeIds)
+                latestId = Math.Max(kvp.Value, latestId);
+
+            return latestId;
+        }
+
+        
         public void CreateNode(MapNode node)
         {
-            if (nodeContainer.HasNode(node.Id)) return;
-            
-            MapData.Nodes.Add(node);
-            mapGrapher.DrawNode(node);
-            
-            SelectNode(node);
+            var command = new CreateNodeCommand(this, node);
+            CommandManager.ExecuteCommand(command);
         }
+
         public void CreateNode(Vector2 position)
         {
-            RefreshNodeID();
+            RefreshCurrentNodeID();
             if (!NodeIds.ContainsKey(NodePrefix)) NodeIds.Add(NodePrefix, 1);
             
             string id = NodePrefix + NodeIds[NodePrefix]++.ToString();
@@ -64,59 +118,19 @@ namespace signallerMap.Scripts.editor
                 Position = position
             };
 
-            var command = new CreateNodeCommand(this, node);
-            CommandManager.ExecuteCommand(command);
+            CreateNode(node);
         }
 
-        public int RefreshNodeID()
-        {
-            int latestId = 1;
-
-            if (!NodeIds.ContainsKey(NodePrefix)) return latestId;
-
-            foreach (KeyValuePair<string, int> kvp in NodeIds)
-                latestId = Math.Max(kvp.Value, latestId);
-
-            return latestId;
-        }
-
-        public void SelectNode(MapNode node)
+        public void DeleteNode(MapNode node)
         {
             if (node == null) return;
-            if (SelectedNodes[0] == node) node = SelectedNodes[1];
-            mapGrapher.DeselectNode(SelectedNodes[1]);
-            SelectedNodes[1] = SelectedNodes[0];
-            SelectedNodes[0] = node;
-            mapGrapher.SelectNodePair(SelectedNodes);
-        }
-
-        public void UpdateNode(string id = "")
-        {
-            if (string.IsNullOrEmpty(id)) id = SelectedNodes[0].Id;
-        }
-
-        public void DeleteNode(string id = "", bool isUndo = false)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                if (SelectedNodes[0] == null) return;
-                id = SelectedNodes[0].Id;
-            }
-            MapNode node = MapData.Nodes.FirstOrDefault(n => n.Id == id);
-            if (node == null) return;
-            
-            if (isUndo) NodeIds[node.Prefix]--;
-            while (node.IncomingEdges.Count > 0) DeleteEdge(node.IncomingEdges[0].Id);
-            while (node.OutgoingEdges.Count > 0) DeleteEdge(node.OutgoingEdges[0].Id);
+            while (node.Edges.Count > 0) DeleteEdge(node.Edges[0]);
 
             if (GodotObject.IsInstanceValid(node.Sprite))
                 node.Sprite.QueueFree();
+                
             MapData.Nodes.Remove(node);
             node.Dispose();
-
-            SelectedNodes[0] = SelectedNodes[1];
-            SelectNode(SelectedNodes[0]);
-            SelectedNodes[1] = null;
         }
 
         public void CreateEdge(MapEdge edge)
@@ -124,57 +138,16 @@ namespace signallerMap.Scripts.editor
             MapData.Edges.Add(edge);
             mapGrapher.DrawEdge(edge);
 
-            edge.From.OutgoingEdges.Add(edge);
-            edge.To.IncomingEdges.Add(edge);
-
-            SelectEdge(edge);
+            edge.From.Edges.Add(edge);
+            edge.To.Edges.Add(edge);
         }
 
-        public void CreateEdge(MapNode from, MapNode to, int length, int maxSpeed, bool stumps = false)
-        {
-            int fromId = from.Serial;
-            int toId = to.Serial;
-            string id = NodePrefix + Math.Min(fromId, toId) + Math.Max(fromId, toId);
-
-            MapEdge edge = new MapEdge()
-            {
-                Id = id,
-                From = from,
-                To = to,
-                Length = length,
-                MaxSpeed = maxSpeed
-            };
-
-            var command = new CreateEdgeCommand(this, edge);
-            CommandManager.ExecuteCommand(command);
-        }
-
-        public void SelectEdge(MapEdge edge)
+        public void DeleteEdge(MapEdge edge)
         {
             if (edge == null) return;
-            DeselectCurrentEdge();
-            SelectedEdge = edge;
-            mapGrapher.SelectEdge(edge);
-        }
 
-        public void DeselectCurrentEdge()
-        {
-            if (SelectedEdge == null) return;
-            mapGrapher.DeselectEdge(SelectedEdge);
-            SelectedEdge = null;
-        }
-
-        public void DeleteEdge(string id = "", bool isUndo = false)
-        {
-            if (string.IsNullOrEmpty(id) && SelectedEdge != null) id = SelectedEdge.Id;
-            MapEdge edge = MapData.Edges.FirstOrDefault(e => e.Id == id);
-
-            if (edge == null) return;
-
-            if (edge == SelectedEdge) DeselectCurrentEdge();
-
-            edge.To?.IncomingEdges?.Remove(edge);
-            edge.From?.OutgoingEdges?.Remove(edge);
+            edge.To?.Edges?.Remove(edge);
+            edge.From?.Edges?.Remove(edge);
 
             if (GodotObject.IsInstanceValid(edge.Sprite))
                 edge.Sprite.QueueFree();
@@ -183,10 +156,16 @@ namespace signallerMap.Scripts.editor
             edge.Dispose();
         }
 
+        public void ClearSelection()
+        {
+            Array.Clear(SelectedEdges);
+            Array.Clear(SelectedNodes);
+        }
+
         public void CleanMap()
         {
-            foreach (MapEdge edge in MapData.Edges.ToList()) { DeleteEdge(edge.Id); }
-            foreach (MapNode node in MapData.Nodes.ToList()) { DeleteNode(node.Id); }
+            foreach (MapEdge edge in MapData.Edges.ToList()) { DeleteEdge(edge); }
+            foreach (MapNode node in MapData.Nodes.ToList()) { DeleteNode(node); }
             initialize();
         }
     }

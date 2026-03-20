@@ -1,0 +1,1006 @@
+{
+  "nodes": [
+    {
+      "id": "RK1",
+      "pos": [
+        100,
+        100
+      ]
+    },
+    {
+      "id": "RK2",
+      "pos": [
+        100,
+        175
+      ]
+    },
+    {
+      "id": "RK3",
+      "pos": [
+        100,
+        250
+      ]
+    },
+    {
+      "id": "RK4",
+      "pos": [
+        200,
+        100
+      ]
+    },
+    {
+      "id": "RK5",
+      "pos": [
+        200,
+        175
+      ]
+    },
+    {
+      "id": "RK6",
+      "pos": [
+        200,
+        250
+      ]
+    },
+    {
+      "id": "RK7",
+      "pos": [
+        250,
+        175
+      ]
+    },
+    {
+      "id": "RK8",
+      "pos": [
+        300,
+        250
+      ]
+    },
+    {
+      "id": "RK9",
+      "pos": [
+        400,
+        175
+      ]
+    },
+    {
+      "id": "RK10",
+      "pos": [
+        350,
+        250
+      ]
+    },
+    {
+      "id": "RK11",
+      "pos": [
+        500,
+        175
+      ]
+    },
+    {
+      "id": "RK12",
+      "pos": [
+        500,
+        250
+      ]
+    },
+    {
+      "id": "RE1",
+      "pos": [
+        600,
+        175
+      ]
+    },
+    {
+      "id": "RE2",
+      "pos": [
+        600,
+        250
+      ]
+    },
+    {
+      "id": "RE3",
+      "pos": [
+        700,
+        175
+      ]
+    },
+    {
+      "id": "RE4",
+      "pos": [
+        700,
+        250
+      ]
+    },
+    {
+      "id": "RE5",
+      "pos": [
+        800,
+        175
+      ]
+    },
+    {
+      "id": "RE6",
+      "pos": [
+        800,
+        225
+      ]
+    },
+    {
+      "id": "RE7",
+      "pos": [
+        900,
+        175
+      ]
+    },
+    {
+      "id": "RE8",
+      "pos": [
+        900,
+        225
+      ]
+    },
+    {
+      "id": "RE9",
+      "pos": [
+        925,
+        275
+      ]
+    },
+    {
+      "id": "RE10",
+      "pos": [
+        925,
+        125
+      ]
+    },
+    {
+      "id": "RE11",
+      "pos": [
+        1025,
+        125
+      ]
+    },
+    {
+      "id": "RE12",
+      "pos": [
+        1050,
+        175
+      ]
+    },
+    {
+      "id": "RE13",
+      "pos": [
+        1050,
+        225
+      ]
+    },
+    {
+      "id": "RE14",
+      "pos": [
+        1025,
+        275
+      ]
+    },
+    {
+      "id": "RE15",
+      "pos": [
+        1150,
+        225
+      ]
+    },
+    {
+      "id": "RE16",
+      "pos": [
+        1150,
+        175
+      ]
+    },
+    {
+      "id": "RE17",
+      "pos": [
+        1250,
+        175
+      ]
+    },
+    {
+      "id": "RE18",
+      "pos": [
+        1250,
+        225
+      ]
+    },
+    {
+      "id": "RE19",
+      "pos": [
+        1350,
+        175
+      ]
+    },
+    {
+      "id": "RE20",
+      "pos": [
+        1350,
+        225
+      ]
+    },
+    {
+      "id": "RE21",
+      "pos": [
+        1450,
+        175
+      ]
+    },
+    {
+      "id": "RE22",
+      "pos": [
+        1450,
+        225
+      ]
+    },
+    {
+      "id": "RD1",
+      "pos": [
+        1550,
+        175
+      ]
+    },
+    {
+      "id": "RD2",
+      "pos": [
+        1550,
+        225
+      ]
+    },
+    {
+      "id": "RD3",
+      "pos": [
+        1650,
+        175
+      ]
+    },
+    {
+      "id": "RD4",
+      "pos": [
+        1675,
+        125
+      ]
+    },
+    {
+      "id": "RD5",
+      "pos": [
+        1775,
+        125
+      ]
+    },
+    {
+      "id": "RD6",
+      "pos": [
+        1800,
+        175
+      ]
+    },
+    {
+      "id": "RD7",
+      "pos": [
+        1650,
+        225
+      ]
+    },
+    {
+      "id": "RD8",
+      "pos": [
+        1675,
+        275
+      ]
+    },
+    {
+      "id": "RD9",
+      "pos": [
+        1775,
+        275
+      ]
+    },
+    {
+      "id": "RD10",
+      "pos": [
+        1800,
+        225
+      ]
+    },
+    {
+      "id": "RD11",
+      "pos": [
+        1900,
+        225
+      ]
+    },
+    {
+      "id": "RD12",
+      "pos": [
+        1900,
+        175
+      ]
+    },
+    {
+      "id": "RD28",
+      "pos": [
+        2000,
+        175
+      ]
+    },
+    {
+      "id": "RD29",
+      "pos": [
+        2000,
+        225
+      ]
+    },
+    {
+      "id": "PT3",
+      "pos": [
+        2100,
+        275
+      ]
+    },
+    {
+      "id": "PT2",
+      "pos": [
+        2050,
+        275
+      ]
+    },
+    {
+      "id": "PT4",
+      "pos": [
+        2050,
+        350
+      ]
+    },
+    {
+      "id": "PT5",
+      "pos": [
+        2100,
+        350
+      ]
+    },
+    {
+      "id": "PT6",
+      "pos": [
+        2100,
+        400
+      ]
+    },
+    {
+      "id": "PT7",
+      "pos": [
+        2050,
+        450
+      ]
+    },
+    {
+      "id": "PT8",
+      "pos": [
+        2000,
+        500
+      ]
+    },
+    {
+      "id": "PT16",
+      "pos": [
+        2000,
+        600
+      ]
+    },
+    {
+      "id": "PT17",
+      "pos": [
+        2050,
+        500
+      ]
+    },
+    {
+      "id": "PT18",
+      "pos": [
+        2050,
+        600
+      ]
+    },
+    {
+      "id": "PT19",
+      "pos": [
+        2100,
+        500
+      ]
+    },
+    {
+      "id": "PT20",
+      "pos": [
+        2100,
+        600
+      ]
+    },
+    {
+      "id": "RD30",
+      "pos": [
+        650,
+        300
+      ]
+    },
+    {
+      "id": "RD31",
+      "pos": [
+        500,
+        300
+      ]
+    },
+    {
+      "id": "RD32",
+      "pos": [
+        500,
+        350
+      ]
+    },
+    {
+      "id": "RD33",
+      "pos": [
+        600,
+        350
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "RK25",
+      "station_id": "",
+      "from": "RK4",
+      "to": "RK1",
+      "length": 250,
+      "max_speed": 30
+    },
+    {
+      "id": "RK36",
+      "station_id": "",
+      "from": "RK5",
+      "to": "RK2",
+      "length": 250,
+      "max_speed": 90
+    },
+    {
+      "id": "RK47",
+      "station_id": "",
+      "from": "RK6",
+      "to": "RK3",
+      "length": 250,
+      "max_speed": 90
+    },
+    {
+      "id": "RK58",
+      "station_id": "",
+      "from": "RK7",
+      "to": "RK4",
+      "length": 100,
+      "max_speed": 30
+    },
+    {
+      "id": "RK68",
+      "station_id": "",
+      "from": "RK7",
+      "to": "RK5",
+      "length": 50,
+      "max_speed": 30
+    },
+    {
+      "id": "RK79",
+      "station_id": "",
+      "from": "RK8",
+      "to": "RK6",
+      "length": 100,
+      "max_speed": 30
+    },
+    {
+      "id": "RK911",
+      "station_id": "",
+      "from": "RK10",
+      "to": "RK8",
+      "length": 50,
+      "max_speed": 30
+    },
+    {
+      "id": "RK1113",
+      "station_id": "",
+      "from": "RK12",
+      "to": "RK10",
+      "length": 250,
+      "max_speed": 30
+    },
+    {
+      "id": "RK89",
+      "station_id": "",
+      "from": "RK8",
+      "to": "RK7",
+      "length": 50,
+      "max_speed": 30
+    },
+    {
+      "id": "RK1011",
+      "station_id": "",
+      "from": "RK9",
+      "to": "RK10",
+      "length": 50,
+      "max_speed": 30
+    },
+    {
+      "id": "RK1012",
+      "station_id": "",
+      "from": "RK11",
+      "to": "RK9",
+      "length": 200,
+      "max_speed": 30
+    },
+    {
+      "id": "RD212",
+      "station_id": "",
+      "from": "RE1",
+      "to": "RK11",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD24",
+      "station_id": "",
+      "from": "RE3",
+      "to": "RE1",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD46",
+      "station_id": "",
+      "from": "RE5",
+      "to": "RE3",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD313",
+      "station_id": "",
+      "from": "RE2",
+      "to": "RK12",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD35",
+      "station_id": "",
+      "from": "RE4",
+      "to": "RE2",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD57",
+      "station_id": "",
+      "from": "RE6",
+      "to": "RE4",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD79",
+      "station_id": "",
+      "from": "RE8",
+      "to": "RE6",
+      "length": 500,
+      "max_speed": 90
+    },
+    {
+      "id": "RD68",
+      "station_id": "",
+      "from": "RE7",
+      "to": "RE5",
+      "length": 500,
+      "max_speed": 90
+    },
+    {
+      "id": "RD811",
+      "station_id": "",
+      "from": "RE10",
+      "to": "RE7",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD910",
+      "station_id": "",
+      "from": "RE9",
+      "to": "RE8",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD1415",
+      "station_id": "",
+      "from": "RE13",
+      "to": "RE14",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD1213",
+      "station_id": "",
+      "from": "RE12",
+      "to": "RE11",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD1112",
+      "station_id": "",
+      "from": "RE11",
+      "to": "RE10",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "RD813",
+      "station_id": "",
+      "from": "RE12",
+      "to": "RE7",
+      "length": 250,
+      "max_speed": 90
+    },
+    {
+      "id": "RD914",
+      "station_id": "",
+      "from": "RE13",
+      "to": "RE8",
+      "length": 250,
+      "max_speed": 90
+    },
+    {
+      "id": "RD1015",
+      "station_id": "",
+      "from": "RE14",
+      "to": "RE9",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "RD1317",
+      "station_id": "",
+      "from": "RE16",
+      "to": "RE12",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD1718",
+      "station_id": "",
+      "from": "RE17",
+      "to": "RE16",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD1820",
+      "station_id": "",
+      "from": "RE19",
+      "to": "RE17",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD2022",
+      "station_id": "",
+      "from": "RE21",
+      "to": "RE19",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD222",
+      "station_id": "",
+      "from": "RD1",
+      "to": "RE21",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD1416",
+      "station_id": "",
+      "from": "RE15",
+      "to": "RE13",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD1619",
+      "station_id": "",
+      "from": "RE18",
+      "to": "RE15",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD1921",
+      "station_id": "",
+      "from": "RE20",
+      "to": "RE18",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD2123",
+      "station_id": "",
+      "from": "RE22",
+      "to": "RE20",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD323",
+      "station_id": "",
+      "from": "RD2",
+      "to": "RE22",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD38",
+      "station_id": "",
+      "from": "RD7",
+      "to": "RD2",
+      "length": 500,
+      "max_speed": 90
+    },
+    {
+      "id": "RD24",
+      "station_id": "",
+      "from": "RD3",
+      "to": "RD1",
+      "length": 500,
+      "max_speed": 90
+    },
+    {
+      "id": "RD89",
+      "station_id": "",
+      "from": "RD8",
+      "to": "RD7",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD45",
+      "station_id": "",
+      "from": "RD4",
+      "to": "RD3",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD56",
+      "station_id": "",
+      "from": "RD5",
+      "to": "RD4",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "RD910",
+      "station_id": "",
+      "from": "RD9",
+      "to": "RD8",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "RD47",
+      "station_id": "",
+      "from": "RD6",
+      "to": "RD3",
+      "length": 250,
+      "max_speed": 90
+    },
+    {
+      "id": "RD811",
+      "station_id": "",
+      "from": "RD10",
+      "to": "RD7",
+      "length": 250,
+      "max_speed": 90
+    },
+    {
+      "id": "RD1011",
+      "station_id": "",
+      "from": "RD10",
+      "to": "RD9",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD67",
+      "station_id": "",
+      "from": "RD6",
+      "to": "RD5",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "RD713",
+      "station_id": "",
+      "from": "RD12",
+      "to": "RD6",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "RD1112",
+      "station_id": "",
+      "from": "RD11",
+      "to": "RD10",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "PT1329",
+      "station_id": "",
+      "from": "RD28",
+      "to": "RD12",
+      "length": 700,
+      "max_speed": 60
+    },
+    {
+      "id": "PT1230",
+      "station_id": "",
+      "from": "RD29",
+      "to": "RD11",
+      "length": 700,
+      "max_speed": 60
+    },
+    {
+      "id": "PT330",
+      "station_id": "",
+      "from": "PT2",
+      "to": "RD29",
+      "length": 300,
+      "max_speed": 60
+    },
+    {
+      "id": "PT429",
+      "station_id": "",
+      "from": "PT3",
+      "to": "RD28",
+      "length": 300,
+      "max_speed": 60
+    },
+    {
+      "id": "PT35",
+      "station_id": "",
+      "from": "PT4",
+      "to": "PT2",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "PT46",
+      "station_id": "",
+      "from": "PT5",
+      "to": "PT3",
+      "length": 1200,
+      "max_speed": 100
+    },
+    {
+      "id": "PT58",
+      "station_id": "",
+      "from": "PT7",
+      "to": "PT4",
+      "length": 600,
+      "max_speed": 100
+    },
+    {
+      "id": "PT67",
+      "station_id": "",
+      "from": "PT6",
+      "to": "PT5",
+      "length": 300,
+      "max_speed": 100
+    },
+    {
+      "id": "PT78",
+      "station_id": "",
+      "from": "PT7",
+      "to": "PT6",
+      "length": 100,
+      "max_speed": 100
+    },
+    {
+      "id": "PT917",
+      "station_id": "",
+      "from": "PT16",
+      "to": "PT8",
+      "length": 200,
+      "max_speed": 30
+    },
+    {
+      "id": "PT1819",
+      "station_id": "",
+      "from": "PT18",
+      "to": "PT17",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "PT2021",
+      "station_id": "",
+      "from": "PT20",
+      "to": "PT19",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "PT720",
+      "station_id": "",
+      "from": "PT19",
+      "to": "PT6",
+      "length": 200,
+      "max_speed": 90
+    },
+    {
+      "id": "PT818",
+      "station_id": "",
+      "from": "PT17",
+      "to": "PT7",
+      "length": 100,
+      "max_speed": 90
+    },
+    {
+      "id": "PT89",
+      "station_id": "",
+      "from": "PT8",
+      "to": "PT7",
+      "length": 100,
+      "max_speed": 45
+    },
+    {
+      "id": "RD531",
+      "station_id": "",
+      "from": "RD30",
+      "to": "RE4",
+      "length": 100,
+      "max_speed": 45
+    },
+    {
+      "id": "RD3132",
+      "station_id": "",
+      "from": "RD30",
+      "to": "RD31",
+      "length": 200,
+      "max_speed": 45
+    },
+    {
+      "id": "RD3134",
+      "station_id": "",
+      "from": "RD30",
+      "to": "RD33",
+      "length": 50,
+      "max_speed": 45
+    },
+    {
+      "id": "RD3334",
+      "station_id": "",
+      "from": "RD33",
+      "to": "RD32",
+      "length": 150,
+      "max_speed": 45
+    },
+    {
+      "id": "XX00",
+      "station_id": "",
+      "from": "RK9",
+      "to": "RK7",
+      "length": 150,
+      "max_speed": 100
+    }
+  ]
+}

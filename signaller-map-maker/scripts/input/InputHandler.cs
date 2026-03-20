@@ -8,7 +8,7 @@ namespace signallerMap.Scripts.Input
 {
     public partial class InputHandler : Node2D
     {
-        Editor editor;
+        Editor _editor;
         MapGrapher mapGrapher;
         private Vector2 _clickStartPosition;
         private float _clickThreshold = 10.0f; // If moved more than this, it's a drag, not a draw
@@ -16,7 +16,7 @@ namespace signallerMap.Scripts.Input
         public override void _Ready()
         {
             mapGrapher = GetNode<MapGrapher>("/root/Map/MapGrapher");
-            editor = GetNode<Editor>("/root/Map/Editor");
+            _editor = GetNode<Editor>("/root/Map/Editor");
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -26,37 +26,54 @@ namespace signallerMap.Scripts.Input
 
         private void HandleInput(InputEvent @event)
         {
-            if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
+            // if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
+            // {
+            //     if (mouseButton.Pressed)
+            //     {
+            //         _clickStartPosition = mouseButton.GlobalPosition;
+            //     }
+            //     else
+            //     {
+            //         float dragDistance = mouseButton.GlobalPosition.DistanceTo(_clickStartPosition);
+                    
+            //         if (dragDistance < _clickThreshold)
+            //         {
+            //             MouseClicked();
+                        
+            //         }
+            //     }
+            // }
+            
+            if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Right)
             {
                 if (mouseButton.Pressed)
                 {
-                    _clickStartPosition = mouseButton.GlobalPosition;
-                }
-                else
-                {
-                    float dragDistance = mouseButton.GlobalPosition.DistanceTo(_clickStartPosition);
-                    
-                    if (dragDistance < _clickThreshold)
-                    {
-                        SpawnNode();
-                        
-                    }
+                    MouseClicked();
                 }
             }
+            
             else if (@event.IsActionPressed("undo"))
+                CommandManager.Undo();
+            else if (@event.IsActionPressed("redo"))
+                CommandManager.Redo();
+            else if (@event.IsActionPressed("change_mode_movement"))
+                _editor.SetEditorMode(new MovementMode(_editor));
+            else if (@event.IsActionPressed("change_mode_build"))
+                _editor.SetEditorMode(new BuildingMode(_editor));
+            else if (@event.IsActionPressed("create_movement"))
             {
-                
+                _editor.FireUiEvent(EditorUiEvent.CreateMovementPressed);
             }
         }
 
-        private void SpawnNode()
+        private void MouseClicked()
         {
             Vector2 mousePos = mapGrapher.ToLocal(GetGlobalMousePosition());
             Vector2 nodePos = new Vector2(
                 (float)Math.Round(mousePos.X / 25f) * 25f,
                 (float)Math.Round(mousePos.Y / 25f) * 25f
             );
-            editor.NodeClickEvent(nodePos);
+            _editor.RMBClickEvent(nodePos);
         }
     }
 }

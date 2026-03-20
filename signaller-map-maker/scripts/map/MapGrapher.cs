@@ -14,13 +14,11 @@ namespace signallerMap.Scripts.Graphics
         private Node2D edgesContainer;
         private Node2D nodesContainer;
         private Editor _editor;
-        public const float LineWidth = 3.5f;
-        public const int StumpLength = 10;
-        public const int SignalRadius = 5;
-        public const string LineColor = "FFFFFF";
-        public const string SelectedNodeColor = "ffce1c";
-        public const string SecondSelectedNodeColor = "ffde66";
-        public const string SelectedEdgeColor = "fcb653";
+        public readonly float LineWidth = 3.5f;
+        public readonly int StumpLength = 10;
+        public readonly int SignalRadius = 5;
+        public readonly Color LineColor = Color.FromHtml("FFFFFF");
+        public GrapherColors colors = new();
 
         public override void _Ready()
         {
@@ -58,7 +56,7 @@ namespace signallerMap.Scripts.Graphics
             if (edge.From == null || edge.To == null) return;
 
             ColorRect line = new ColorRect();
-            line.Color = Color.FromHtml(LineColor);
+            line.Color = LineColor;
             line.ZIndex = 1;
 
             Vector2 startPos = edge.From.Position;
@@ -82,58 +80,72 @@ namespace signallerMap.Scripts.Graphics
                 {
                     if (mouse.ButtonIndex == MouseButton.Left)
                     {
-                        _editor.SelectEdge(edge);
+                        _editor.EdgeClick(edge);
                     }
                 }
             };
+
+            line.MouseEntered += () => _editor.MouseEnterEdgeEvent(edge);
+            line.MouseExited += () => _editor.MouseExitEdgeEvent(edge);
 
             edge.Sprite = line;
             edgesContainer.AddChild(line);
         }
 
+        public void SelectEdgePair(MapEdge[] edge)
+        {
+            if (edge[0]?.Sprite != null) edge[0].Sprite.Modulate = colors.SelectedEdgeColor;
+            if (edge[1]?.Sprite != null) edge[1].Sprite.Modulate = colors.SecondSelectedEdgeColor;
+        }
         public void SelectEdge(MapEdge edge)
         {
             if (edge == null || edge.Sprite == null) return;
-            edge.Sprite.Color = Color.FromHtml(SelectedEdgeColor);
+            edge.Sprite.Color = colors.SelectedEdgeColor;
         }
 
-        public void DeselectEdge(MapEdge edge)
+        public void ChangeEdgeColor(MapEdge edge, Color color)
+        {
+            if (edge == null) return;
+            edge.Sprite.Color = color;
+        }
+
+        public void ClearEdgeColor(MapEdge edge)
         {
             if (edge == null || edge.Sprite == null) return;
-            edge.Sprite.Color = Color.FromHtml(LineColor);
+            edge.Sprite.Color = LineColor;
         }
 
-        public void LoadStumps()
-        {
-            List<MapEdge> edges = MapData.Edges;
-            foreach (MapEdge edge in edges)
-            {
-                if (edge.From.IncomingEdges.Count == 0)
-                    DrawStump(edge, edge.From);
-                else if (edge.To.OutgoingEdges.Count == 0) 
-                    DrawStump(edge, edge.To);
-            }
-        }
+        // public void LoadStumps()
+        // {
+        //     List<MapEdge> edges = MapData.Edges;
+        //     foreach (MapEdge edge in edges)
+        //     {
+        //         if (edge.From.IncomingEdges.Count == 0)
+        //             DrawStump(edge, edge.From);
+        //         else if (edge.To.OutgoingEdges.Count == 0) 
+        //             DrawStump(edge, edge.To);
+        //     }
+        // }
 
-        private void DrawStump(MapEdge edge, MapNode node)
-        {
-            if (edge == null || node == null) return;
+        // private void DrawStump(MapEdge edge, MapNode node)
+        // {
+        //     if (edge == null || node == null) return;
 
-            Vector2 stumpDir = (edge.From.Position - edge.To.Position).Orthogonal().Normalized() * StumpLength;
+        //     Vector2 stumpDir = (edge.From.Position - edge.To.Position).Orthogonal().Normalized() * StumpLength;
             
-            Line2D stump = new();
-            stump.Width = LineWidth;
-            stump.DefaultColor = Color.FromHtml(LineColor);
-            stump.Antialiased = true;
+        //     Line2D stump = new();
+        //     stump.Width = LineWidth;
+        //     stump.DefaultColor = LineColor;
+        //     stump.Antialiased = true;
             
-            Vector2 stumpTopEdge = node.Position + (stumpDir / 2);
-            Vector2 stumpBottomEdge = node.Position - (stumpDir / 2);
+        //     Vector2 stumpTopEdge = node.Position + (stumpDir / 2);
+        //     Vector2 stumpBottomEdge = node.Position - (stumpDir / 2);
 
-            stump.AddPoint(stumpTopEdge);
-            stump.AddPoint(stumpBottomEdge);
+        //     stump.AddPoint(stumpTopEdge);
+        //     stump.AddPoint(stumpBottomEdge);
 
-            edgesContainer.AddChild(stump);
-        }
+        //     edgesContainer.AddChild(stump);
+        // }
 
         public void LoadNodes()
         {
@@ -175,7 +187,7 @@ namespace signallerMap.Scripts.Graphics
             area.InputEvent += (viewport, @event, shapeIdx) =>
             {
                 if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
-                    _editor.SelectNode(node);
+                    _editor.NodeClick(node);
             };
 
             nodesContainer.AddChild(sprite);
@@ -183,14 +195,20 @@ namespace signallerMap.Scripts.Graphics
 
         public void SelectNodePair(MapNode[] node)
         {
-            if (node[0]?.Sprite != null) node[0].Sprite.Modulate = Color.FromHtml(SelectedNodeColor);
-            if (node[1]?.Sprite != null) node[1].Sprite.Modulate = Color.FromHtml(SecondSelectedNodeColor);
+            if (node[0]?.Sprite != null) node[0].Sprite.Modulate = colors.SelectedNodeColor;
+            if (node[1]?.Sprite != null) node[1].Sprite.Modulate = colors.SecondSelectedNodeColor;
+        }
+
+        public void SelectNode(MapNode node)
+        {
+            if (node == null) return;
+            node.Sprite.Modulate = colors.SelectedNodeColor;
         }
 
         public void DeselectNode(MapNode node)
         {
             if (node == null || node.Sprite == null) return;
-            node.Sprite.Modulate = Color.FromHtml(LineColor);
+            node.Sprite.Modulate = LineColor;
         }
         
         public void Undo()
@@ -406,7 +424,7 @@ namespace signallerMap.Scripts.Graphics
 
         // private void RemoveTrainColor(MapEdge sectionEdge)
         // {
-        //     sectionEdge.Sprite.DefaultColor = Color.FromHtml(LineColor);
+        //     sectionEdge.Sprite.DefaultColor = LineColor;
         // }
         
     }
@@ -416,4 +434,11 @@ namespace signallerMap.Scripts.Graphics
         public MapEdge Data { get; set; }
     }
 
+    internal class GrapherColors
+    {
+        public Color SelectedNodeColor { get; set; } = Color.FromHtml("ffce1c");
+        public Color SelectedEdgeColor { get; set; } = Color.FromHtml("fcb653");
+        public Color SecondSelectedNodeColor { get; set; } = Color.FromHtml("ffde66");
+        public Color SecondSelectedEdgeColor { get; set; } = Color.FromHtml("f7be6d");
+    }
 }
