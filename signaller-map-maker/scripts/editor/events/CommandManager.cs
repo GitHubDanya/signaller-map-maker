@@ -55,10 +55,7 @@ namespace signallerMap.Scripts.editor
         
         public void Execute()
         {
-            if (_editor.nodeContainer.HasNode(_node.Id)) return;
-            
-            MapData.Nodes.Add(_node);
-            _editor.mapGrapher.DrawNode(_node);
+            _editor.CreateNode(_node);
         }
 
         public void Undo()
@@ -139,25 +136,25 @@ namespace signallerMap.Scripts.editor
     {
         private readonly Editor _editor;
         private readonly MapNode _node;
-        private readonly MapNodeMovement _movement;
+        private readonly MapMovement _movement;
         public bool IsValid => _node != null && _movement != null;
-        public CreateNodeMovementCommand(Editor editor, MapNode node, MapNodeMovement movement)
+        public CreateNodeMovementCommand(Editor editor, MapMovement movement)
         {
             _editor = editor;
-            _node = node;
             _movement = movement;
+            _node = movement?.GetNode();
         }
 
         public void Execute()
         {   
             if (_node == null || _movement == null) return;
-            _node.Movements.Add(_movement);
+            _editor.CreateMovement(_movement);
         }
 
         public void Undo()
         {
-            if (!_node.Movements.Contains(_movement)) return;
-            _node.Movements.Remove(_movement);
+            if (_node == null || !_node.Movements.Contains(_movement)) return;
+            _editor.DeleteNodeMovement(_movement);
         }
     }
 

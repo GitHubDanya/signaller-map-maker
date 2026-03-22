@@ -4,23 +4,23 @@ using System.Linq;
 using signallerMap.Scripts.Data;
 using System.Collections.Generic;
 using signallerMap.Scripts.Graphics;
+using System.Xml.Serialization;
 
 namespace signallerMap.Scripts.editor
 {
     internal class BuildingMode : IEditorMode
     {
-        // All actions related to editing the map structure are defined here.
-        // 
+        // This mode is responsible for creating, removing and manipulating map objects.
 
         private Editor _editor;
-        private MapNode[] selectedNodes;
-        private MapEdge[] selectedEdges;
+        private List<MapNode> selectedNodes;
+        private List<MapEdge> selectedEdges;
         
         internal BuildingMode(Editor editor)
         {
             _editor = editor;
-            editor.SelectedEdges = new MapEdge[2];
-            editor.SelectedNodes = new MapNode[2];
+            _editor.SetSelectableNodeCount(2);
+            _editor.SetSelectableEdgeCount(1);
             selectedNodes = editor.SelectedNodes;
             selectedEdges = editor.SelectedEdges;
 
@@ -34,8 +34,6 @@ namespace signallerMap.Scripts.editor
             grapher.colors = grapherColors;
         }
 
-        
-
         public void OnInputEvent(EditorInputEvent inputEvent, EditorInputEventArgs args)
         {
             switch (inputEvent)
@@ -43,9 +41,9 @@ namespace signallerMap.Scripts.editor
                 case EditorInputEvent.RMBClick when args is EditorInputMouseClickArgs clickArgs:
                     MouseClick(clickArgs.Position); break;
                 case EditorInputEvent.NodeClick when args is EditorInputOnNodeArgs nodeArgs:
-                    SelectNode(nodeArgs.Node); break;
+                    _editor.SelectNode(nodeArgs.Node); break;
                 case EditorInputEvent.EdgeClick when args is EditorInputOnEdgeArgs edgeArgs:
-                    SelectEdge(edgeArgs.Edge); break;
+                    _editor.SelectEdge(edgeArgs.Edge); break;
             }
         }
 
@@ -69,32 +67,40 @@ namespace signallerMap.Scripts.editor
 
             if (existingNode != null) return;
 
-            _editor.CreateNode(position);
-            existingNode = MapData.Nodes.First(n => n.Position.IsEqualApprox(position));
-            SelectNode(existingNode);
-        }
+            MapNode node = CreateNodeFromPosition(position);
 
-        private void SelectNode(MapNode node)
+            CreateNodeCommand command = new(_editor, node);
+            CommandManager.ExecuteCommand(command);
+            
+            _editor.SelectNode(node);
+        }
+        
+        private MapNode CreateNodeFromPosition(Vector2 position)
         {
-            if (node == null) return;
-            if (selectedNodes[0] == node) node = selectedNodes[1];
-            _editor.mapGrapher.DeselectNode(selectedNodes[1]);
-            selectedNodes[1] = selectedNodes[0];
-            selectedNodes[0] = node;
-            _editor.mapGrapher.SelectNodePair(selectedNodes);
+            _editor.RefreshCurrentNodeID();
+            
+            string prefix = _editor.NextNodePrefix;
+            if (!_editor.NodeIds.ContainsKey(prefix)) _editor.NodeIds[prefix] = 1;
+            int serial = _editor.NodeIds[_editor.NextNodePrefix];
+
+            MapNode node = new()
+            {
+                Serial = serial,
+                Prefix = prefix,
+                Id = prefix + serial.ToString(),
+                Position = position
+            };
+
+            return node;
         }
 
         private void DeleteNode(MapNode node = null)
         {
-            if (node == null && selectedNodes[0] != null) node = selectedNodes[0];
-            else return;
+            if (node == null && selectedNodes.Count > 0) node = selectedNodes[0];
+            if (node == null) return;
 
             var command = new DeleteNodeCommand(_editor, node);
             CommandManager.ExecuteCommand(command);
-            
-            selectedNodes[0] = selectedNodes[1];
-            SelectNode(selectedNodes[0]);
-            selectedNodes[1] = null;
         }
 
         private void uiCreateEdge(EditorUiCreateEdgeArgs args)
@@ -122,29 +128,13 @@ namespace signallerMap.Scripts.editor
             var command = new CreateEdgeCommand(_editor, edge);
             CommandManager.ExecuteCommand(command);
 
-            SelectEdge(edge);
+            _editor.SelectEdge(edge);
         }
 
-        private void SelectEdge(MapEdge edge)
+        private void DeleteEdge(MapEdge edge = null)
         {
+            if (edge == null && selectedNodes.Count > 0) edge = selectedEdges[0];
             if (edge == null) return;
-            DeselectEdge();
-            selectedEdges[0] = edge;
-            
-            MapGrapher grapher = _editor.mapGrapher;
-            grapher.SelectEdge(edge);
-        }
-
-        private void DeselectEdge()
-        {
-            if (selectedEdges[0] == null) return;
-            _editor.mapGrapher.ClearEdgeColor(selectedEdges[0]);
-            selectedEdges[0] = null;
-        }
-
-        private void DeleteEdge()
-        {
-            if (selectedEdges[0] == null) return;
             CommandManager.ExecuteCommand(new DeleteEdgeCommand(_editor, selectedEdges[0]));
         }
     }

@@ -50,7 +50,13 @@ namespace signallerMap.Scripts.Data
     internal class JsonMapNode
     {
         public string id { get; set; }
-        public float[] pos { get; set; }
+        public float[] position { get; set; }
+    }
+
+    internal class JsonMapMovement
+    {
+        public string from { get; set; }
+        public string to { get; set; }
     }
 
     internal class JsonMapEdge

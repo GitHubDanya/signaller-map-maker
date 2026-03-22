@@ -44,11 +44,16 @@ namespace signallerMap.Scripts.Input
             //     }
             // }
             
-            if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Right)
+            if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed)
             {
-                if (mouseButton.Pressed)
+                
+                if (mouseButton.ButtonIndex == MouseButton.Right)
                 {
-                    MouseClicked();
+                    MouseClicked(true);
+                }
+                else if (mouseButton.ButtonIndex == MouseButton.Left)
+                {
+                    //MouseClicked(false);
                 }
             }
             
@@ -61,19 +66,17 @@ namespace signallerMap.Scripts.Input
             else if (@event.IsActionPressed("change_mode_build"))
                 _editor.SetEditorMode(new BuildingMode(_editor));
             else if (@event.IsActionPressed("create_movement"))
-            {
                 _editor.FireUiEvent(EditorUiEvent.CreateMovementPressed);
-            }
         }
 
-        private void MouseClicked()
+        private void MouseClicked(bool right = false)
         {
             Vector2 mousePos = mapGrapher.ToLocal(GetGlobalMousePosition());
             Vector2 nodePos = new Vector2(
                 (float)Math.Round(mousePos.X / 25f) * 25f,
                 (float)Math.Round(mousePos.Y / 25f) * 25f
             );
-            _editor.RMBClickEvent(nodePos);
+            if (right) _editor.RMBClickEvent(nodePos); else _editor.LMBClickEvent(nodePos);
         }
     }
 }

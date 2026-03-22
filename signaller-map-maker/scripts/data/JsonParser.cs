@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using Godot;
+using signallerMap.Scripts.editor;
 
 namespace signallerMap.Scripts.Data
 {
@@ -26,7 +27,7 @@ namespace signallerMap.Scripts.Data
             return new()
             {
                 id = node.Id,
-                pos = new[] { node.Position.X, node.Position.Y }
+                position = new[] { node.Position.X, node.Position.Y }
             };
         }
         
@@ -35,7 +36,8 @@ namespace signallerMap.Scripts.Data
             return new()
             {
                 Id = jsonNode.id,
-                Position = new Vector2(jsonNode.pos[0], jsonNode.pos[1])
+                Position = new Vector2(jsonNode.position[0], jsonNode.position[1]),
+                Movements = new()
             };
         }
 
@@ -83,6 +85,38 @@ namespace signallerMap.Scripts.Data
                 To = to,
                 Length = jsonEdge.length,
                 MaxSpeed = jsonEdge.max_speed
+            };
+        }
+
+        public List<MapMovement> ConvertToToMapMovements(List<JsonMapMovement> movements)
+        {
+            List<MapMovement> mapMovements = new();
+            foreach (JsonMapMovement movement in movements) mapMovements.Add(JSONToMapMovement(movement));
+            return mapMovements;
+        }
+
+        public List<JsonMapMovement> ConvertToJsonMapMovements(List<MapMovement> movements)
+        {
+            List<JsonMapMovement> mapMovements = new();
+            foreach (MapMovement movement in movements) mapMovements.Add(MapMovementToJSON(movement));
+            return mapMovements;
+        }
+
+        private MapMovement JSONToMapMovement(JsonMapMovement movement)
+        {
+            return new()
+            {
+                from = MapData.Edges.FirstOrDefault(e => e.Id == movement.from),
+                to = MapData.Edges.FirstOrDefault(e => e.Id == movement.to)
+            };
+        }
+        
+        public JsonMapMovement MapMovementToJSON(MapMovement movement)
+        {
+            return new()
+            {
+                from = movement.from.Id,
+                to = movement.to.Id
             };
         }
     }

@@ -53,7 +53,7 @@ namespace signallerMap.Scripts.UI
         }
 
         private void uiNodePrefixFieldChanged(string text)
-        { _editor.NodePrefix = text.Length >= 2 ? text.Substring(0, 2) : text; }
+        { _editor.NextNodePrefix = text.Length >= 2 ? text.Substring(0, 2) : text; }
         private void uiNodeUpdateButtonPressed()
         { _editor.FireUiEvent(EditorUiEvent.NodeUpdateButtonPressed); }
         private void uiNodeDeleteButtonPressed()
@@ -75,10 +75,16 @@ namespace signallerMap.Scripts.UI
         private void uiJsonSaveButtonPressed() { _fileManager.SaveData(); }
         private void UpdateUi()
         {
-            nodeLabel.Text = _editor.SelectedNodes[0]?.Id ?? "NaN";
-            edgeFromLabel.Text = _editor.SelectedNodes[0]?.Id ?? "NaN";
-            edgeSelectedLabel.Text = _editor.SelectedEdges[0]?.Id ?? "NaN";
-            edgeToLabel.Text = _editor.SelectedNodes[1]?.Id ?? "NaN";
+            nodeLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 0);
+            edgeFromLabel.Text = GetIdOrNaN(_editor.SelectedEdges, 0);
+            edgeSelectedLabel.Text = GetIdOrNaN(_editor.SelectedEdges, 0);
+            edgeToLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 1);
+        }
+        private string GetIdOrNaN<T>(List<T> list, int index) where T : class
+        {
+            return index < list.Count && list[index] != null
+                ? (list[index] as dynamic).Id.ToString()
+                : "NaN";
         }
     }
 }

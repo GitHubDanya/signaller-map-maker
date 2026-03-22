@@ -2,66 +2,162 @@
   "nodes": [
     {
       "id": "XX1",
-      "pos": [
+      "position": [
         600,
-        300
+        400
       ]
     },
     {
       "id": "XX2",
-      "pos": [
+      "position": [
         700,
-        300
+        400
       ]
     },
     {
       "id": "XX3",
-      "pos": [
+      "position": [
         800,
-        200
+        400
       ]
     },
     {
       "id": "XX4",
-      "pos": [
-        800,
+      "position": [
+        900,
         400
       ]
     },
     {
       "id": "XX5",
-      "pos": [
-        500,
-        200
+      "position": [
+        1000,
+        400
       ]
     },
     {
       "id": "XX6",
-      "pos": [
-        500,
+      "position": [
+        1050,
+        350
+      ]
+    },
+    {
+      "id": "XX7",
+      "position": [
+        1100,
+        350
+      ]
+    },
+    {
+      "id": "XX8",
+      "position": [
+        1200,
+        350
+      ]
+    },
+    {
+      "id": "XX9",
+      "position": [
+        1050,
         400
+      ]
+    },
+    {
+      "id": "XX10",
+      "position": [
+        1100,
+        400
+      ]
+    },
+    {
+      "id": "XX11",
+      "position": [
+        1200,
+        400
+      ]
+    },
+    {
+      "id": "XX12",
+      "position": [
+        600,
+        450
+      ]
+    },
+    {
+      "id": "XX13",
+      "position": [
+        700,
+        450
+      ]
+    },
+    {
+      "id": "XX14",
+      "position": [
+        800,
+        450
+      ]
+    },
+    {
+      "id": "XX15",
+      "position": [
+        900,
+        450
+      ]
+    },
+    {
+      "id": "XX16",
+      "position": [
+        1000,
+        450
+      ]
+    },
+    {
+      "id": "XX17",
+      "position": [
+        1050,
+        500
+      ]
+    },
+    {
+      "id": "XX18",
+      "position": [
+        1100,
+        500
+      ]
+    },
+    {
+      "id": "XX19",
+      "position": [
+        1200,
+        500
+      ]
+    },
+    {
+      "id": "XX20",
+      "position": [
+        1050,
+        450
+      ]
+    },
+    {
+      "id": "XX21",
+      "position": [
+        1100,
+        450
+      ]
+    },
+    {
+      "id": "XX22",
+      "position": [
+        1200,
+        450
       ]
     }
   ],
   "edges": [
     {
-      "id": "XX27",
-      "station_id": "",
-      "from": "XX1",
-      "to": "XX6",
-      "length": 123,
-      "max_speed": 123
-    },
-    {
-      "id": "XX26",
-      "station_id": "",
-      "from": "XX1",
-      "to": "XX5",
-      "length": 123,
-      "max_speed": 123
-    },
-    {
-      "id": "XX23",
+      "id": "XX12",
       "station_id": "",
       "from": "XX2",
       "to": "XX1",
@@ -69,7 +165,7 @@
       "max_speed": 123
     },
     {
-      "id": "XX34",
+      "id": "XX23",
       "station_id": "",
       "from": "XX3",
       "to": "XX2",
@@ -77,12 +173,342 @@
       "max_speed": 123
     },
     {
-      "id": "XX35",
+      "id": "XX34",
       "station_id": "",
       "from": "XX4",
-      "to": "XX2",
+      "to": "XX3",
       "length": 123,
       "max_speed": 123
+    },
+    {
+      "id": "XX45",
+      "station_id": "",
+      "from": "XX5",
+      "to": "XX4",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX56",
+      "station_id": "",
+      "from": "XX6",
+      "to": "XX5",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX67",
+      "station_id": "",
+      "from": "XX7",
+      "to": "XX6",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX78",
+      "station_id": "",
+      "from": "XX8",
+      "to": "XX7",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX910",
+      "station_id": "",
+      "from": "XX10",
+      "to": "XX9",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1011",
+      "station_id": "",
+      "from": "XX11",
+      "to": "XX10",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX59",
+      "station_id": "",
+      "from": "XX9",
+      "to": "XX5",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1213",
+      "station_id": "",
+      "from": "XX13",
+      "to": "XX12",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1314",
+      "station_id": "",
+      "from": "XX14",
+      "to": "XX13",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1415",
+      "station_id": "",
+      "from": "XX15",
+      "to": "XX14",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1516",
+      "station_id": "",
+      "from": "XX16",
+      "to": "XX15",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1617",
+      "station_id": "",
+      "from": "XX17",
+      "to": "XX16",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1718",
+      "station_id": "",
+      "from": "XX18",
+      "to": "XX17",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1819",
+      "station_id": "",
+      "from": "XX19",
+      "to": "XX18",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX2021",
+      "station_id": "",
+      "from": "XX21",
+      "to": "XX20",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX2122",
+      "station_id": "",
+      "from": "XX22",
+      "to": "XX21",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX1620",
+      "station_id": "",
+      "from": "XX20",
+      "to": "XX16",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX315",
+      "station_id": "",
+      "from": "XX3",
+      "to": "XX15",
+      "length": 123,
+      "max_speed": 123
+    },
+    {
+      "id": "XX414",
+      "station_id": "",
+      "from": "XX4",
+      "to": "XX14",
+      "length": 123,
+      "max_speed": 123
+    }
+  ],
+  "movements": [
+    {
+      "from": "XX23",
+      "to": "XX12"
+    },
+    {
+      "from": "XX23",
+      "to": "XX12"
+    },
+    {
+      "from": "XX315",
+      "to": "XX23"
+    },
+    {
+      "from": "XX34",
+      "to": "XX23"
+    },
+    {
+      "from": "XX34",
+      "to": "XX23"
+    },
+    {
+      "from": "XX414",
+      "to": "XX45"
+    },
+    {
+      "from": "XX45",
+      "to": "XX34"
+    },
+    {
+      "from": "XX45",
+      "to": "XX34"
+    },
+    {
+      "from": "XX45",
+      "to": "XX34"
+    },
+    {
+      "from": "XX414",
+      "to": "XX45"
+    },
+    {
+      "from": "XX45",
+      "to": "XX34"
+    },
+    {
+      "from": "XX59",
+      "to": "XX45"
+    },
+    {
+      "from": "XX56",
+      "to": "XX45"
+    },
+    {
+      "from": "XX45",
+      "to": "XX59"
+    },
+    {
+      "from": "XX45",
+      "to": "XX56"
+    },
+    {
+      "from": "XX67",
+      "to": "XX56"
+    },
+    {
+      "from": "XX56",
+      "to": "XX67"
+    },
+    {
+      "from": "XX78",
+      "to": "XX67"
+    },
+    {
+      "from": "XX67",
+      "to": "XX78"
+    },
+    {
+      "from": "XX910",
+      "to": "XX59"
+    },
+    {
+      "from": "XX59",
+      "to": "XX910"
+    },
+    {
+      "from": "XX1011",
+      "to": "XX910"
+    },
+    {
+      "from": "XX910",
+      "to": "XX1011"
+    },
+    {
+      "from": "XX1213",
+      "to": "XX1314"
+    },
+    {
+      "from": "XX1213",
+      "to": "XX1314"
+    },
+    {
+      "from": "XX1314",
+      "to": "XX414"
+    },
+    {
+      "from": "XX1314",
+      "to": "XX1415"
+    },
+    {
+      "from": "XX1314",
+      "to": "XX1415"
+    },
+    {
+      "from": "XX1415",
+      "to": "XX1516"
+    },
+    {
+      "from": "XX1516",
+      "to": "XX315"
+    },
+    {
+      "from": "XX1415",
+      "to": "XX1516"
+    },
+    {
+      "from": "XX1516",
+      "to": "XX1617"
+    },
+    {
+      "from": "XX1516",
+      "to": "XX1620"
+    },
+    {
+      "from": "XX1620",
+      "to": "XX1516"
+    },
+    {
+      "from": "XX1617",
+      "to": "XX1516"
+    },
+    {
+      "from": "XX1617",
+      "to": "XX1718"
+    },
+    {
+      "from": "XX1718",
+      "to": "XX1617"
+    },
+    {
+      "from": "XX1819",
+      "to": "XX1718"
+    },
+    {
+      "from": "XX1718",
+      "to": "XX1819"
+    },
+    {
+      "from": "XX1620",
+      "to": "XX2021"
+    },
+    {
+      "from": "XX1620",
+      "to": "XX2021"
+    },
+    {
+      "from": "XX2021",
+      "to": "XX1620"
+    },
+    {
+      "from": "XX2021",
+      "to": "XX2122"
+    },
+    {
+      "from": "XX2122",
+      "to": "XX2021"
     }
   ]
 }

@@ -11,6 +11,7 @@ namespace signallerMap.Scripts.Data
         [Export] Editor _editor;
         private List<JsonMapEdge> jsonMapEdges;
         private List<JsonMapNode> jsonMapNodes;
+        private List<JsonMapMovement> jsonMapMovements;
         private JsonParser parser = new();
         
         public void LoadData()
@@ -73,8 +74,11 @@ namespace signallerMap.Scripts.Data
         {
             jsonMapNodes = parser.ConvertToJsonMapNodes(MapData.Nodes);
             jsonMapEdges = parser.ConvertToJsonMapEdges(MapData.Edges);
+            jsonMapMovements = new();
+            foreach (MapNode node in MapData.Nodes)
+            jsonMapMovements.AddRange(parser.ConvertToJsonMapMovements(node.Movements));
 
-            var data = new { nodes = jsonMapNodes, edges = jsonMapEdges };
+            var data = new { nodes = jsonMapNodes, edges = jsonMapEdges, movements = jsonMapMovements };
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = JsonSerializer.Serialize(data, options);
 
@@ -112,6 +116,8 @@ namespace signallerMap.Scripts.Data
                 foreach (MapNode node in nodes) _editor.CreateNode(node);
                 List<MapEdge> edges = parser.ConvertToMapEdges(loadJsonEdgesFromData(mapdata));
                 foreach (MapEdge edge in edges) _editor.CreateEdge(edge);
+                List<MapMovement> movements = parser.ConvertToToMapMovements(loadJsonMovementsFromData(mapdata));
+                foreach (MapMovement movement in movements) _editor.CreateMovement(movement);
             }).CallDeferred();
 
             CommandManager.Clear();
@@ -138,5 +144,16 @@ namespace signallerMap.Scripts.Data
             }
             return jsonMapEdges;
         } 
+
+        private List<JsonMapMovement> loadJsonMovementsFromData(JsonDocument mapdata)
+        {
+            List<JsonMapMovement> jsonMapMovements = new();
+            foreach (var movement in mapdata.RootElement.GetProperty("movements").EnumerateArray())
+            {
+                JsonMapMovement jsonMovement = JsonSerializer.Deserialize<JsonMapMovement>(movement.GetRawText());
+                if (jsonMovement != null) jsonMapMovements.Add(jsonMovement);
+            }
+            return jsonMapMovements;
+        }
     }
 }

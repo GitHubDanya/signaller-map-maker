@@ -92,14 +92,14 @@ namespace signallerMap.Scripts.Graphics
             edgesContainer.AddChild(line);
         }
 
-        public void SelectEdgePair(MapEdge[] edge)
+        public void SelectEdgePair(List<MapEdge> edges)
         {
-            if (edge[0]?.Sprite != null) edge[0].Sprite.Modulate = colors.SelectedEdgeColor;
-            if (edge[1]?.Sprite != null) edge[1].Sprite.Modulate = colors.SecondSelectedEdgeColor;
+            if (edges.Count > 0 && edges[0]?.Sprite != null) edges[0].Sprite.Color = colors.SelectedEdgeColor;
+            if (edges.Count > 1 && edges[1]?.Sprite != null) edges[1].Sprite.Color = colors.SecondSelectedEdgeColor;
         }
         public void SelectEdge(MapEdge edge)
         {
-            if (edge == null || edge.Sprite == null) return;
+            if (edge == null || !IsInstanceValid(edge.Sprite)) return;
             edge.Sprite.Color = colors.SelectedEdgeColor;
         }
 
@@ -109,43 +109,11 @@ namespace signallerMap.Scripts.Graphics
             edge.Sprite.Color = color;
         }
 
-        public void ClearEdgeColor(MapEdge edge)
+        public void DeselectEdge(MapEdge edge)
         {
             if (edge == null || edge.Sprite == null) return;
             edge.Sprite.Color = LineColor;
         }
-
-        // public void LoadStumps()
-        // {
-        //     List<MapEdge> edges = MapData.Edges;
-        //     foreach (MapEdge edge in edges)
-        //     {
-        //         if (edge.From.IncomingEdges.Count == 0)
-        //             DrawStump(edge, edge.From);
-        //         else if (edge.To.OutgoingEdges.Count == 0) 
-        //             DrawStump(edge, edge.To);
-        //     }
-        // }
-
-        // private void DrawStump(MapEdge edge, MapNode node)
-        // {
-        //     if (edge == null || node == null) return;
-
-        //     Vector2 stumpDir = (edge.From.Position - edge.To.Position).Orthogonal().Normalized() * StumpLength;
-            
-        //     Line2D stump = new();
-        //     stump.Width = LineWidth;
-        //     stump.DefaultColor = LineColor;
-        //     stump.Antialiased = true;
-            
-        //     Vector2 stumpTopEdge = node.Position + (stumpDir / 2);
-        //     Vector2 stumpBottomEdge = node.Position - (stumpDir / 2);
-
-        //     stump.AddPoint(stumpTopEdge);
-        //     stump.AddPoint(stumpBottomEdge);
-
-        //     edgesContainer.AddChild(stump);
-        // }
 
         public void LoadNodes()
         {
@@ -193,10 +161,10 @@ namespace signallerMap.Scripts.Graphics
             nodesContainer.AddChild(sprite);
         }
 
-        public void SelectNodePair(MapNode[] node)
+        public void SelectNodePair(List<MapNode> nodes)
         {
-            if (node[0]?.Sprite != null) node[0].Sprite.Modulate = colors.SelectedNodeColor;
-            if (node[1]?.Sprite != null) node[1].Sprite.Modulate = colors.SecondSelectedNodeColor;
+            if (nodes.Count > 0 && nodes[0]?.Sprite != null) nodes[0].Sprite.Modulate = colors.SelectedNodeColor;
+            if (nodes.Count > 1 && nodes[1]?.Sprite != null) nodes[1].Sprite.Modulate = colors.SecondSelectedNodeColor;
         }
 
         public void SelectNode(MapNode node)
@@ -210,11 +178,38 @@ namespace signallerMap.Scripts.Graphics
             if (node == null || node.Sprite == null) return;
             node.Sprite.Modulate = LineColor;
         }
-        
-        public void Undo()
-        {
+
+        // public void LoadStumps()
+        // {
+        //     List<MapEdge> edges = MapData.Edges;
+        //     foreach (MapEdge edge in edges)
+        //     {
+        //         if (edge.From.IncomingEdges.Count == 0)
+        //             DrawStump(edge, edge.From);
+        //         else if (edge.To.OutgoingEdges.Count == 0) 
+        //             DrawStump(edge, edge.To);
+        //     }
+        // }
+
+        // private void DrawStump(MapEdge edge, MapNode node)
+        // {
+        //     if (edge == null || node == null) return;
+
+        //     Vector2 stumpDir = (edge.From.Position - edge.To.Position).Orthogonal().Normalized() * StumpLength;
             
-        }
+        //     Line2D stump = new();
+        //     stump.Width = LineWidth;
+        //     stump.DefaultColor = LineColor;
+        //     stump.Antialiased = true;
+            
+        //     Vector2 stumpTopEdge = node.Position + (stumpDir / 2);
+        //     Vector2 stumpBottomEdge = node.Position - (stumpDir / 2);
+
+        //     stump.AddPoint(stumpTopEdge);
+        //     stump.AddPoint(stumpBottomEdge);
+
+        //     edgesContainer.AddChild(stump);
+        // }
 
         // public void LoadStations()
         // {

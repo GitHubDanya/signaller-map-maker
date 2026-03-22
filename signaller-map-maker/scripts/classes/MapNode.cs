@@ -16,17 +16,22 @@ namespace signallerMap.Scripts
         public Vector2 Position { get; set; }
         public List<MapEdge> Edges = new List<MapEdge>();
         public List<MapSignal> Signals = new List<MapSignal>();
-        public List<MapNodeMovement> Movements = new();
+        public List<MapMovement> Movements = new();
         public Sprite2D Sprite { get; set; }
     }
 
-    internal partial class MapNodeMovement
+    internal partial class MapMovement
     {
         public MapEdge from;
         public MapEdge to;
         public MapNode GetNode()
         {
-            return from.To.Id == to.From.Id ? from.To : from.From;
+            if (from.To == to.From || from.To == to.To)
+                return from.To;
+
+            if (from.From == to.From || from.From == to.To)
+                return from.From;
+            return null;
         }
     }
 }

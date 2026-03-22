@@ -28,6 +28,8 @@ namespace signallerMap.Scripts
         LMBClick,
         RMBClick,
         NodeClick,
+        NodeHover,
+        NodeUnhover,
         EdgeClick,
         EdgeHover,
         EdgeUnhover
