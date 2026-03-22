@@ -31,19 +31,7 @@ namespace signallerMap.Scripts.Data
     {
         public string id { get; set; }
         public string node { get; set; }
-        public List<JsonMapSignalMovement> movements { get; set; }
-        public bool below_edge { get; set; }
-    }
-
-    internal class JsonMapSignalMovement
-    {
-        public string from { get; set; }
-        public string to { get; set; }
-    }
-
-    internal class JsonMapSignalState
-    {
-        public string id { get; set; }
+        public string edge { get; set; }
         public string state { get; set; }
     }
 

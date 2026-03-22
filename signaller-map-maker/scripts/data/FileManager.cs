@@ -12,6 +12,7 @@ namespace signallerMap.Scripts.Data
         private List<JsonMapEdge> jsonMapEdges;
         private List<JsonMapNode> jsonMapNodes;
         private List<JsonMapMovement> jsonMapMovements;
+        private List<JsonMapSignal> jsonMapSignals;
         private JsonParser parser = new();
         
         public void LoadData()
@@ -77,8 +78,14 @@ namespace signallerMap.Scripts.Data
             jsonMapMovements = new();
             foreach (MapNode node in MapData.Nodes)
             jsonMapMovements.AddRange(parser.ConvertToJsonMapMovements(node.Movements));
+            jsonMapSignals = parser.ConvertToJsonMapSignals(MapData.Signals);
 
-            var data = new { nodes = jsonMapNodes, edges = jsonMapEdges, movements = jsonMapMovements };
+            var data = new {
+                nodes = jsonMapNodes,
+                edges = jsonMapEdges,
+                movements = jsonMapMovements,
+                signals = jsonMapSignals };
+
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = JsonSerializer.Serialize(data, options);
 
@@ -118,6 +125,8 @@ namespace signallerMap.Scripts.Data
                 foreach (MapEdge edge in edges) _editor.CreateEdge(edge);
                 List<MapMovement> movements = parser.ConvertToToMapMovements(loadJsonMovementsFromData(mapdata));
                 foreach (MapMovement movement in movements) _editor.CreateMovement(movement);
+                List<MapSignal> signals = parser.ConvertToMapSignals(loadJsonSignalsFromData(mapdata));
+                foreach (MapSignal signal in signals) _editor.CreateSignal(signal);
             }).CallDeferred();
 
             CommandManager.Clear();
@@ -154,6 +163,17 @@ namespace signallerMap.Scripts.Data
                 if (jsonMovement != null) jsonMapMovements.Add(jsonMovement);
             }
             return jsonMapMovements;
+        }
+
+        private List<JsonMapSignal> loadJsonSignalsFromData(JsonDocument mapdata)
+        {
+            List<JsonMapSignal> jsonSignals = new();
+            foreach (var signal in mapdata.RootElement.GetProperty("signals").EnumerateArray())
+            {
+                JsonMapSignal jsonMapSignal = JsonSerializer.Deserialize<JsonMapSignal>(signal.GetRawText());
+                if (jsonMapSignal != null) jsonMapSignals.Add(jsonMapSignal);
+            }
+            return jsonMapSignals;
         }
     }
 }

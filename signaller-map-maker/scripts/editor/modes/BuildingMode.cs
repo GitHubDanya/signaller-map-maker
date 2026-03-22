@@ -115,6 +115,7 @@ namespace signallerMap.Scripts.editor
             int fromId = from.Serial;
             int toId = to.Serial;
             string id = from.Prefix + Math.Min(fromId, toId) + Math.Max(fromId, toId);
+            if (from.Prefix != to.Prefix) id += 'N';
 
             MapEdge edge = new MapEdge()
             {
@@ -133,7 +134,7 @@ namespace signallerMap.Scripts.editor
 
         private void DeleteEdge(MapEdge edge = null)
         {
-            if (edge == null && selectedNodes.Count > 0) edge = selectedEdges[0];
+            if (edge == null && selectedEdges.Count > 0) edge = selectedEdges[0];
             if (edge == null) return;
             CommandManager.ExecuteCommand(new DeleteEdgeCommand(_editor, selectedEdges[0]));
         }

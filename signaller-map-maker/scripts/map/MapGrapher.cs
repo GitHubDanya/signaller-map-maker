@@ -33,30 +33,6 @@ namespace signallerMap.Scripts.Graphics
             signalsContainer = GetNode<Node2D>("SignalContainer");
             _editor = GetNode<Editor>("/root/Map/Editor");
         }
-        
-        public void DrawMap()
-        {
-            LoadNodes();
-            //LoadEdges();
-            //LoadStumps();
-            // LoadStations();
-            // LoadSignals();
-        }
-
-        public void LoadEdges()
-        {
-            List<MapEdge> edges = MapData.Edges;
-            
-            foreach (Node child in edgesContainer.GetChildren())
-            {
-                child.QueueFree();
-            }
-
-            foreach (var edge in edges)
-            {
-                DrawEdge(edge);
-            }
-        }
 
         public void DrawEdge(MapEdge edge)
         {
@@ -122,14 +98,6 @@ namespace signallerMap.Scripts.Graphics
             edge.Sprite.Color = LineColor;
         }
 
-        public void LoadNodes()
-        {
-            foreach (MapNode node in MapData.Nodes)
-            {
-                DrawNode(node);
-            }
-        }
-
         public void DrawNode(MapNode node)
         {
             IEnumerable<Sprite2D> childrenNodes = nodesContainer.GetChildren().Where(c => c is Sprite2D).Cast<Sprite2D>();
@@ -186,11 +154,6 @@ namespace signallerMap.Scripts.Graphics
             node.Sprite.Modulate = LineColor;
         }
 
-        public void DrawSignalsForNode(MapNode node)
-        {
-            
-        }
-
         public void DrawSignal(MapSignal signal)
         {
             MapMovement movement = signal.Movement;
@@ -201,7 +164,7 @@ namespace signallerMap.Scripts.Graphics
             {
                 SignalState.Danger => dangerSignalTexture,
                 SignalState.DoubleYellow => preliminaryCautionSignalTexture,
-                SignalState.Amber => cautionSignalTexture,
+                SignalState.Caution => cautionSignalTexture,
                 _ => proceedSignalTexture
             };
 
@@ -224,6 +187,11 @@ namespace signallerMap.Scripts.Graphics
 
             signal.Sprite = sprite;
             signalsContainer.AddChild(sprite);
+        }
+
+        public void DrawPlatform(MapStationPlatform platform)
+        {
+            
         }
 
         // public void LoadStumps()

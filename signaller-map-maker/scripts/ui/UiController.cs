@@ -76,8 +76,8 @@ namespace signallerMap.Scripts.UI
         private void UpdateUi()
         {
             nodeLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 0);
-            edgeFromLabel.Text = GetIdOrNaN(_editor.SelectedEdges, 0);
             edgeSelectedLabel.Text = GetIdOrNaN(_editor.SelectedEdges, 0);
+            edgeFromLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 0);
             edgeToLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 1);
         }
         private string GetIdOrNaN<T>(List<T> list, int index) where T : class

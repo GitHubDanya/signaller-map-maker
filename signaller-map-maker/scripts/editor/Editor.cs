@@ -82,7 +82,6 @@ namespace signallerMap.Scripts.editor
 
             return latestId;
         }
-
         
         public void CreateNode(MapNode node)
         {

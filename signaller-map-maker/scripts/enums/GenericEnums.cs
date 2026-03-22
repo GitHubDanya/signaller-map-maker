@@ -6,7 +6,7 @@ namespace signallerMap.Scripts
     {
         Proceed = 0,
         DoubleYellow = 1,
-        Amber = 2,
+        Caution = 2,
         Danger = 3
     }
 

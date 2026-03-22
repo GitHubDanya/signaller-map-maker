@@ -124,5 +124,48 @@ namespace signallerMap.Scripts.Data
                 to = movement.to.Id
             };
         }
+
+        public List<MapSignal> ConvertToMapSignals(List<JsonMapSignal> signals)
+        {
+            List<MapSignal> mapSignals = new();
+            foreach (JsonMapSignal signal in signals) mapSignals.Add(JsonToMapSignal(signal));
+            return mapSignals;
+        }
+
+        public List<JsonMapSignal> ConvertToJsonMapSignals(List<MapSignal> signals)
+        {
+            List<JsonMapSignal> mapSignals = new();
+            foreach (MapSignal signal in signals) mapSignals.Add(MapSignalToJSON(signal));
+            return mapSignals;
+        }
+
+        private MapSignal JsonToMapSignal(JsonMapSignal signal)
+        {
+            MapNode node = MapData.Nodes.FirstOrDefault(n => n.Id == signal.node);
+            return new()
+            {
+                Id = signal.id,
+                Node = node,
+                Movement = node.Movements.FirstOrDefault(m => m.from.Id == signal.edge),
+                State = signal.state switch
+                {
+                    "danger" => SignalState.Danger,
+                    "caution" => SignalState.Caution,
+                    "doubleyellow" => SignalState.DoubleYellow,
+                    _ => SignalState.Proceed
+                }
+            };
+        }
+        
+        public JsonMapSignal MapSignalToJSON(MapSignal signal)
+        {
+            return new()
+            {
+                id = signal.Id,
+                node = signal.Node.Id,
+                edge = signal.Movement.from.Id,
+                state = signal.State.ToString().ToLower()
+            };
+        } 
     }
 }

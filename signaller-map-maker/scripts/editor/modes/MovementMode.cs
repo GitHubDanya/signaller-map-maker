@@ -79,9 +79,9 @@ namespace signallerMap.Scripts.editor
             MapNode node = movement.GetNode();
             if (node == null) return;
 
-            string prefix = _editor.NextNodePrefix;
+            string prefix = node.Prefix;
             if (!_editor.SignalIds.ContainsKey(prefix)) _editor.SignalIds[prefix] = 1;
-            int serial = _editor.SignalIds[_editor.NextNodePrefix];
+            int serial = _editor.SignalIds[node.Prefix];
 
             MapSignal signal = new()
             {
@@ -96,6 +96,7 @@ namespace signallerMap.Scripts.editor
 
         private MapMovement CreateMovementBetweenSelected()
         {
+            if (selectedEdges.Count < 2) return null;
             if (selectedEdges[0] == null
             || selectedEdges[1] == null
             || selectedEdges[0] == selectedEdges[1]) return null;
