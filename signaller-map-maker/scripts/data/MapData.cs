@@ -8,5 +8,6 @@ namespace signallerMap.Scripts.Data
     {
         public static List<MapNode> Nodes = new();
         public static List<MapEdge> Edges = new();
+        public static List<MapSignal> Signals = new();
     }
 }

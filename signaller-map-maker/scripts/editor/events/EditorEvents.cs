@@ -32,4 +32,9 @@ namespace signallerMap.Scripts.editor
     {
         public MapEdge Edge;
     }
+
+    internal class EditorInputOnSignalArgs : EditorInputEventArgs
+    {
+        public MapSignal Signal;
+    }
 }

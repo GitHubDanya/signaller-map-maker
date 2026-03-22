@@ -33,9 +33,14 @@ namespace signallerMap.Scripts.Data
         
         private MapNode JSONToMapNode(JsonMapNode jsonNode)
         {
+            if (jsonNode.id.Length < 2) jsonNode.id = "XX000";
+            int serial = int.Parse(jsonNode.id.Substring(2));
+            string prefix = jsonNode.id.Substring(0, 2);
             return new()
             {
-                Id = jsonNode.id,
+                Serial = serial,
+                Prefix = prefix,
+                Id = prefix + serial,
                 Position = new Vector2(jsonNode.position[0], jsonNode.position[1]),
                 Movements = new()
             };

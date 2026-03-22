@@ -18,6 +18,7 @@ namespace signallerMap.Scripts.editor
         [Export] public MapGrapher mapGrapher;
         [Export] public Node2D nodeContainer;
         [Export] public Node2D edgeContainer;
+        [Export] public Node2D signalContainer;
         public List<MapNode> SelectedNodes = new();
         public List<MapEdge> SelectedEdges = new();
         public int SelectableNodeCount { get; private set; } = 2;
@@ -25,6 +26,7 @@ namespace signallerMap.Scripts.editor
         public IEditorMode editorMode;
 
         public Dictionary<string, int> NodeIds = new();
+        public Dictionary<string, int> SignalIds = new();
         public string NextNodePrefix { get; set; } = "XX";
 
         public override void _Ready()
@@ -44,57 +46,30 @@ namespace signallerMap.Scripts.editor
             editorMode = mode;
         }
 
+        private void FireInputEvent(EditorInputEvent e, EditorInputEventArgs args)
+        { editorMode.OnInputEvent(e, args); }
+
         public void LMBClickEvent(Vector2 position)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.LMBClick,
-            new EditorInputMouseClickArgs() { Position = position });
-        }
-
+        { FireInputEvent(EditorInputEvent.LMBClick, new EditorInputMouseClickArgs { Position = position }); }
         public void RMBClickEvent(Vector2 position)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.RMBClick,
-            new EditorInputMouseClickArgs() { Position = position });
-        }
-
+        { FireInputEvent(EditorInputEvent.RMBClick, new EditorInputMouseClickArgs { Position = position }); }
         public void NodeClick(MapNode node)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.NodeClick,
-            new EditorInputOnNodeArgs() { Node = node } );
-        }
-
+        { FireInputEvent(EditorInputEvent.NodeClick, new EditorInputOnNodeArgs { Node = node }); }
         public void EdgeClick(MapEdge edge)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.EdgeClick,
-            new EditorInputOnEdgeArgs() { Edge = edge } );
-        }
-        
+        { FireInputEvent(EditorInputEvent.EdgeClick, new EditorInputOnEdgeArgs { Edge = edge }); }
+        public void SignalClick(MapSignal signal)
+        { FireInputEvent(EditorInputEvent.SignalClick, new EditorInputOnSignalArgs { Signal = signal}); }
         public void MouseEnterNodeEvent(MapNode node)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.NodeHover,
-            new EditorInputOnNodeArgs() { Node = node } );
-        }
-
+        { FireInputEvent(EditorInputEvent.NodeHover, new EditorInputOnNodeArgs { Node = node }); }
         public void MouseExitNodeEvent(MapNode node)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.NodeUnhover,
-            new EditorInputOnNodeArgs() { Node = node } );
-        }
-
+        { FireInputEvent(EditorInputEvent.NodeUnhover, new EditorInputOnNodeArgs { Node = node }); }
         public void MouseEnterEdgeEvent(MapEdge edge)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.EdgeHover,
-            new EditorInputOnEdgeArgs() { Edge = edge } );
-        }
+        { FireInputEvent(EditorInputEvent.EdgeHover, new EditorInputOnEdgeArgs { Edge = edge }); }
+         public void MouseExitEdgeEvent(MapEdge edge)
+         { FireInputEvent(EditorInputEvent.EdgeUnhover, new EditorInputOnEdgeArgs { Edge = edge });}
+        public void FireUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args = null)
+        { editorMode.OnUiEvent(uiEvent, args); }
 
-        public void MouseExitEdgeEvent(MapEdge edge)
-        {
-            editorMode.OnInputEvent(EditorInputEvent.EdgeUnhover,
-            new EditorInputOnEdgeArgs() { Edge = edge });
-        }
-
-        public void FireUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args = null) {
-            editorMode.OnUiEvent(uiEvent, args);
-        }
 
         public int RefreshCurrentNodeID()
         {
@@ -111,12 +86,12 @@ namespace signallerMap.Scripts.editor
         
         public void CreateNode(MapNode node)
         {
-            if (nodeContainer.HasNode(node.Id)) return;
+            if (MapData.Nodes.Contains(node) || nodeContainer.HasNode(node.Id)) return;
             
             MapData.Nodes.Add(node);
             mapGrapher.DrawNode(node);
             
-            if (!NodeIds.ContainsKey(NextNodePrefix)) NodeIds.Add(NextNodePrefix, 1);
+            if (!NodeIds.ContainsKey(NextNodePrefix)) NodeIds[NextNodePrefix] = 1;
             NodeIds[NextNodePrefix]++;
         }
 
@@ -234,6 +209,7 @@ namespace signallerMap.Scripts.editor
         public void CreateMovement(MapMovement movement)
         {
             if (movement == null || movement.from == null || movement.to == null) return;
+            if (MapData.Nodes.SelectMany(n => n.Movements).Contains(movement)) return;
             movement.GetNode()?.Movements.Add(movement);
         }
 
@@ -241,6 +217,35 @@ namespace signallerMap.Scripts.editor
         {
             if (movement == null) return;
             movement.GetNode()?.Movements.Remove(movement);
+        }
+
+        public void CreateSignal(MapSignal signal)
+        {
+            if (MapData.Signals.Contains(signal) ||
+            signalContainer.GetNodeOrNull<Sprite2D>(signal.Id) != null) return;
+
+            MapData.Signals.Add(signal);
+            mapGrapher.DrawSignal(signal);
+
+            if (!signal.Node.Signals.Contains(signal))
+            signal.Node.Signals.Add(signal);
+
+            string prefix = signal.Node.Prefix;
+            if (!SignalIds.ContainsKey(prefix)) SignalIds[prefix] = 1;
+            SignalIds[prefix]++;
+        }
+
+        public void DeleteSignal(MapSignal signal)
+        {
+            if (signal == null) return;
+
+            signal.Node.Signals.Remove(signal);
+
+            if (GodotObject.IsInstanceValid(signal.Sprite))
+                signal.Sprite.QueueFree();
+
+            MapData.Signals.Remove(signal);
+            signal.Dispose();
         }
 
         public void ClearSelection()

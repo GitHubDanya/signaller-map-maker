@@ -67,6 +67,8 @@ namespace signallerMap.Scripts.Input
                 _editor.SetEditorMode(new BuildingMode(_editor));
             else if (@event.IsActionPressed("create_movement"))
                 _editor.FireUiEvent(EditorUiEvent.CreateMovementPressed);
+            else if (@event.IsActionPressed("create_signal"))
+                _editor.FireUiEvent(EditorUiEvent.CreateSignalPressed);
         }
 
         private void MouseClicked(bool right = false)

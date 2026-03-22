@@ -50,7 +50,6 @@ namespace signallerMap.Scripts.editor
                     DisplayEdgeMovements(edgeArgs.Edge); break;
                 case EditorInputEvent.EdgeUnhover when args is EditorInputOnEdgeArgs edgeArgs:
                     HideEdgeMovements(edgeArgs.Edge); break;
-
             }
         }
         public void OnUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args)
@@ -59,14 +58,47 @@ namespace signallerMap.Scripts.editor
             {
                 case EditorUiEvent.CreateMovementPressed when args is null:
                     CreateAndLogMovementBetweenSelected(); break;
+                case EditorUiEvent.CreateSignalPressed when args is null:
+                    CreateSignalBetweenSelected(); break;
             }
         }
 
         private void CreateAndLogMovementBetweenSelected()
         {
+            MapMovement movement = CreateMovementBetweenSelected();
+            if (movement == null) return;
+
+            var command = new CreateNodeMovementCommand(_editor, movement);
+            CommandManager.ExecuteCommand(command);
+        }
+
+        private void CreateSignalBetweenSelected()
+        {
+            MapMovement movement = CreateMovementBetweenSelected();
+            if (movement == null) return;
+            MapNode node = movement.GetNode();
+            if (node == null) return;
+
+            string prefix = _editor.NextNodePrefix;
+            if (!_editor.SignalIds.ContainsKey(prefix)) _editor.SignalIds[prefix] = 1;
+            int serial = _editor.SignalIds[_editor.NextNodePrefix];
+
+            MapSignal signal = new()
+            {
+               Id = prefix + serial.ToString(),
+               Node = node,
+               Movement = movement
+            };
+
+            var command = new CreateSignalCommand(_editor, signal);
+            CommandManager.ExecuteCommand(command);
+        }
+
+        private MapMovement CreateMovementBetweenSelected()
+        {
             if (selectedEdges[0] == null
             || selectedEdges[1] == null
-            || selectedEdges[0] == selectedEdges[1]) return;
+            || selectedEdges[0] == selectedEdges[1]) return null;
 
             MapMovement movement = new()
             {
@@ -74,8 +106,7 @@ namespace signallerMap.Scripts.editor
                 to = selectedEdges[0]
             };
 
-            var command = new CreateNodeMovementCommand(_editor, movement);
-            CommandManager.ExecuteCommand(command);
+            return movement;
         }
 
         private void DisplayEdgeMovements(MapEdge edge)

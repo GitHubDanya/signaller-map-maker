@@ -14,8 +14,8 @@ namespace signallerMap.Scripts
         public string Prefix { get; set; }
         public string Id { get; set; }
         public Vector2 Position { get; set; }
-        public List<MapEdge> Edges = new List<MapEdge>();
-        public List<MapSignal> Signals = new List<MapSignal>();
+        public List<MapEdge> Edges = new();
+        public List<MapSignal> Signals = new();
         public List<MapMovement> Movements = new();
         public Sprite2D Sprite { get; set; }
     }
@@ -31,6 +31,24 @@ namespace signallerMap.Scripts
 
             if (from.From == to.From || from.From == to.To)
                 return from.From;
+            return null;
+        }
+
+        public MapNode GetTargetNode()
+        {
+            MapNode node = GetNode();
+            if (node == null) return null;
+            if (to.To == node) return to.From;
+            if (to.From == node) return to.To;
+            return null;
+        }
+
+        public MapNode GetSourceNode()
+        {
+            MapNode node = GetNode();
+            if (node == null) return null;
+            if (from.To == node) return from.From;
+            if (from.From == node) return from.To;
             return null;
         }
     }

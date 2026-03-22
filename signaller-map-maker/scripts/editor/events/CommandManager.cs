@@ -158,6 +158,55 @@ namespace signallerMap.Scripts.editor
         }
     }
 
+    internal class DeleteNodeMovementCommand : ICommand
+    {
+        private readonly Editor _editor;
+        private readonly MapNode _node;
+        private readonly MapMovement _movement;
+        public bool IsValid => _node != null && _movement != null;
+        public DeleteNodeMovementCommand(Editor editor, MapMovement movement)
+        {
+            _editor = editor;
+            _movement = movement;
+            _node = movement?.GetNode();
+        }
+
+        public void Execute()
+        {   
+            if (_node == null || !_node.Movements.Contains(_movement)) return;
+            _editor.DeleteNodeMovement(_movement);
+        }
+
+        public void Undo()
+        {
+            if (_node == null || _movement == null) return;
+            _editor.CreateMovement(_movement);
+        }
+    }
+
+    internal class CreateSignalCommand : ICommand
+    {
+        private readonly Editor _editor;
+        private readonly MapSignal _signal;
+        public bool IsValid => _signal != null;
+        public CreateSignalCommand(Editor editor, MapSignal signal)
+        {
+            _editor = editor;
+            _signal = signal;
+        }
+
+        public void Execute()
+        {
+            if (_signal == null) return;
+            _editor.CreateSignal(_signal);
+        }
+        
+        public void Undo()
+        {
+            _editor.DeleteSignal(_signal);
+        }
+    }
+
     internal interface ICommand
     {
         void Execute();

@@ -11,12 +11,18 @@ namespace signallerMap.Scripts.Graphics
 {
     internal partial class MapGrapher : Node2D
     {
+        [Export] Texture2D dangerSignalTexture { get; set; }
+        [Export] Texture2D cautionSignalTexture { get; set; }
+        [Export] Texture2D preliminaryCautionSignalTexture { get; set; }
+        [Export] Texture2D proceedSignalTexture { get; set; }
         private Node2D edgesContainer;
         private Node2D nodesContainer;
+        private Node2D signalsContainer;
         private Editor _editor;
         public readonly float LineWidth = 3.5f;
         public readonly int StumpLength = 10;
-        public readonly int SignalRadius = 5;
+        public readonly int SignalXOffset = 10;
+        public readonly float SignalYOffset = 5.5f;
         public readonly Color LineColor = Color.FromHtml("FFFFFF");
         public GrapherColors colors = new();
 
@@ -24,6 +30,7 @@ namespace signallerMap.Scripts.Graphics
         {
             edgesContainer = GetNode<Node2D>("EdgeContainer");
             nodesContainer = GetNode<Node2D>("NodeContainer");
+            signalsContainer = GetNode<Node2D>("SignalContainer");
             _editor = GetNode<Editor>("/root/Map/Editor");
         }
         
@@ -179,6 +186,46 @@ namespace signallerMap.Scripts.Graphics
             node.Sprite.Modulate = LineColor;
         }
 
+        public void DrawSignalsForNode(MapNode node)
+        {
+            
+        }
+
+        public void DrawSignal(MapSignal signal)
+        {
+            MapMovement movement = signal.Movement;
+            MapNode node = movement.GetNode();
+            MapNode sourceNode = movement.GetSourceNode();
+
+            Texture2D texture = signal.State switch
+            {
+                SignalState.Danger => dangerSignalTexture,
+                SignalState.DoubleYellow => preliminaryCautionSignalTexture,
+                SignalState.Amber => cautionSignalTexture,
+                _ => proceedSignalTexture
+            };
+
+            Vector2 direction = (node.Position - sourceNode.Position).Normalized();
+            Vector2 position = node.Position - (direction * SignalXOffset);
+            float angle = (float)Math.Atan2(direction.Y, direction.X);
+            Vector2 offset = new Vector2(0, -SignalYOffset).Rotated(angle);
+            position += offset;
+
+            
+            Sprite2D sprite = new()
+            {
+                Name = signal.Id,
+                Position = position,
+                Texture = texture,
+                Rotation = angle,
+                TextureFilter = TextureFilterEnum.Nearest,
+                Scale = new Vector2(0.5f, 0.5f) 
+            };
+
+            signal.Sprite = sprite;
+            signalsContainer.AddChild(sprite);
+        }
+
         // public void LoadStumps()
         // {
         //     List<MapEdge> edges = MapData.Edges;
@@ -196,12 +243,12 @@ namespace signallerMap.Scripts.Graphics
         //     if (edge == null || node == null) return;
 
         //     Vector2 stumpDir = (edge.From.Position - edge.To.Position).Orthogonal().Normalized() * StumpLength;
-            
+
         //     Line2D stump = new();
         //     stump.Width = LineWidth;
         //     stump.DefaultColor = LineColor;
         //     stump.Antialiased = true;
-            
+
         //     Vector2 stumpTopEdge = node.Position + (stumpDir / 2);
         //     Vector2 stumpBottomEdge = node.Position - (stumpDir / 2);
 
@@ -231,9 +278,9 @@ namespace signallerMap.Scripts.Graphics
         //     Node stationsContainer = GetNode<Node>("StationsContainer");
         //     Node2D stationNode = new Node2D();
         //     stationNode.Name = station.Id;
-            
+
         //     stationsContainer.AddChild(stationNode);
-            
+
 
         //     foreach (MapStationPlatform platform in station.Platforms)
         //     {
@@ -297,70 +344,8 @@ namespace signallerMap.Scripts.Graphics
         //     }
         // }
 
-        // public void DrawSignal(MapSignal signal, float yOffset = 20)
-        // {
-        //     if (signalsContainer.GetNodeOrNull<SignalSprite>(signal.Id) != null) return;
 
-        //     MapNode signalNode = signal.Node;
 
-        //     int signalIndex = signalNode.Signals.IndexOf(signal) + 1;
-        //     yOffset *= signalIndex;
-    
-        //     SignalSprite signalSprite = new SignalSprite();
-        //     signalSprite.Radius = SignalRadius;
-        //     signalSprite.Position = signalNode.Position;
-        //     signalSprite.Name = signal.Id;
-        //     signalSprite.Signal = signal;
-
-        //     string signalColor = SignalGreenColor;
-
-        //     switch (signal.State)
-        //     {
-        //         case SignalState.Danger: signalColor = SignalRedColor; break;
-        //         case SignalState.Amber:
-        //         case SignalState.DoubleYellow: signalColor = SignalYellowColor; break;
-        //         case SignalState.Proceed: signalColor = SignalGreenColor; break;
-        //     }
-
-        //     signalSprite.Color = Color.FromHtml(signalColor);
-
-        //     Vector2 offset = new Vector2(0, yOffset);
-        //     if (signal.DrawBelowEdge) signalSprite.Position += offset;
-        //     else signalSprite.Position -= offset; 
-
-        //     signalsContainer.AddChild(signalSprite);
-
-        //     MapSignalMovement movement = signal.SignalMovement;
-        //     Polygon2D signalDirectionSprite = new Polygon2D();
-        //     signalDirectionSprite.Polygon = new Vector2[]
-        //     {
-        //             new Vector2(0, -SignalRadius),
-        //             new Vector2(0, SignalRadius),
-        //             new Vector2(SignalRadius * 2f, 0)
-        //     };
-
-        //     Vector2 SourcePos = signal.Node.Position;
-        //     Vector2 TargetPos;
-
-        //     if (movement.From.To.Id == signal.Node.Id) // the movement is left to right
-        //     {
-        //         // the movement vector is towards the end of the right node
-        //         TargetPos = movement.To.To.Position;
-        //     }
-        //     else if (movement.To.To.Id == signal.Node.Id) // the movement is right to left
-        //     {
-        //         // the movement vector is towards the start of the left node
-        //         TargetPos = movement.To.From.Position;
-        //     }
-        //     else return;
-
-        //     Vector2 signalDirection = TargetPos - SourcePos;
-        //     signalDirectionSprite.Rotation = signalDirection.Angle();
-
-        //     signalDirectionSprite.Color = signalSprite.Color;
-        //     signalSprite.AddChild(signalDirectionSprite);
-        // }
-        
         // public void UpdateAllSections()
         // {
         //     foreach (MapEdge section in MapData.Edges)
@@ -381,7 +366,7 @@ namespace signallerMap.Scripts.Graphics
         //     else
         //     {
         //         OccupySection(section);
-                
+
         //         bool trainTRTS = train.OccupiedSections.Last().Edge.Platform != null && train.Speed == 0 && !train.LoadingPassengers;
         //         bool trainSPAD = train.SPAD;
 
@@ -421,7 +406,7 @@ namespace signallerMap.Scripts.Graphics
         // {
         //     sectionEdge.Sprite.DefaultColor = LineColor;
         // }
-        
+
     }
 
     internal partial class UiMapEdge : Line2D

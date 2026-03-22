@@ -32,7 +32,10 @@ namespace signallerMap.Scripts
         NodeUnhover,
         EdgeClick,
         EdgeHover,
-        EdgeUnhover
+        EdgeUnhover,
+        SignalClick,
+        SignalHover,
+        SignalUnhover
     }
 
     public enum EditorUiEvent
@@ -46,6 +49,7 @@ namespace signallerMap.Scripts
         EdgeSpeedFieldChanged,
         EdgeDeleteButtonPressed,
         CreateMovementPressed,
+        CreateSignalPressed,
         JsonLoadButtonPressed,
         JsonSaveButtonPressed,
     }

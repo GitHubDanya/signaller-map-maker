@@ -105,7 +105,7 @@ namespace signallerMap.Scripts.editor
 
         private void uiCreateEdge(EditorUiCreateEdgeArgs args)
         {
-            if (selectedNodes[0] == null || selectedNodes[1] == null) return;
+            if (selectedNodes[0] == null || selectedNodes.Count < 1 || selectedNodes[1] == null) return;
             if (int.TryParse(args.EdgeLength, out int el) == false || int.TryParse(args.EdgeSpeed, out int esl) == false) return;
             CreateEdge(selectedNodes[0], selectedNodes[1], el, esl, args.IsStump);
         }
