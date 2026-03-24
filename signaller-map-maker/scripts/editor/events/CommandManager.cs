@@ -61,7 +61,6 @@ namespace signallerMap.Scripts.editor
         public void Undo()
         {
             _editor.DeleteNode(_node);
-            if (_editor.NodeIds.ContainsKey(_node.Prefix)) _editor.NodeIds[_node.Prefix]--;
         }
     }
     internal class DeleteNodeCommand : ICommand

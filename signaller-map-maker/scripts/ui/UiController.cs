@@ -53,7 +53,7 @@ namespace signallerMap.Scripts.UI
         }
 
         private void uiNodePrefixFieldChanged(string text)
-        { _editor.NextNodePrefix = text.Length >= 2 ? text.Substring(0, 2) : text; }
+        { MapFactory.CurrentIdPrefix = text.Length >= 2 ? text.Substring(0, 2) : text; }
         private void uiNodeUpdateButtonPressed()
         { _editor.FireUiEvent(EditorUiEvent.NodeUpdateButtonPressed); }
         private void uiNodeDeleteButtonPressed()
@@ -75,10 +75,11 @@ namespace signallerMap.Scripts.UI
         private void uiJsonSaveButtonPressed() { _fileManager.SaveData(); }
         private void UpdateUi()
         {
-            nodeLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 0);
-            edgeSelectedLabel.Text = GetIdOrNaN(_editor.SelectedEdges, 0);
-            edgeFromLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 0);
-            edgeToLabel.Text = GetIdOrNaN(_editor.SelectedNodes, 1);
+            EditorSelectionManager sm = _editor.selectionManager;
+            nodeLabel.Text = GetIdOrNaN(sm.SelectedNodes, 0);
+            edgeSelectedLabel.Text = GetIdOrNaN(sm.SelectedEdges, 0);
+            edgeFromLabel.Text = GetIdOrNaN(sm.SelectedNodes, 0);
+            edgeToLabel.Text = GetIdOrNaN(sm.SelectedNodes, 1);
         }
         private string GetIdOrNaN<T>(List<T> list, int index) where T : class
         {

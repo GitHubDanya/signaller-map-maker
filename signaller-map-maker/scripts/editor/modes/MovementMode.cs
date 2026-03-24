@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot; 
+using Godot;
+using signallerMap.Scripts.Data;
 using signallerMap.Scripts.Graphics;
 
 namespace signallerMap.Scripts.editor
@@ -12,18 +13,21 @@ namespace signallerMap.Scripts.editor
         // through a pair of edges.
 
         private Editor _editor;
+        private EditorSelectionManager _selectionManager;
         private List<MapEdge> selectedEdges;
         private List<MapNode> selectedNodes;
         private Color movementInColor = Color.FromHtml("E55949");
         private Color movementOutColor = Color.FromHtml("4DE248");
         private Color movementInAndOutColor = Color.FromHtml("F2C34D");
         internal MovementMode(Editor editor)
+
         {
             _editor = editor;
-            _editor.SetSelectableNodeCount(1);
-            _editor.SetSelectableEdgeCount(2);
-            selectedNodes = editor.SelectedNodes;
-            selectedEdges = editor.SelectedEdges;
+            _selectionManager = editor.selectionManager;
+            _selectionManager.SetSelectableNodeCount(1);
+            _selectionManager.SetSelectableEdgeCount(2);
+            selectedNodes = _selectionManager.SelectedNodes;
+            selectedEdges = _selectionManager.SelectedEdges;
 
             MapGrapher grapher = _editor.mapGrapher;
             GrapherColors grapherColors = new()
@@ -35,23 +39,25 @@ namespace signallerMap.Scripts.editor
             };
             grapher.colors = grapherColors;
         }
+        
         public void MouseClick(Vector2 position)
         {
-            _editor.ClearSelection();
+            _selectionManager.ClearSelection();
         }
-
+        
         public void OnInputEvent(EditorInputEvent inputEvent, EditorInputEventArgs args)
         {
             switch (inputEvent)
             {
                 case EditorInputEvent.EdgeClick when args is EditorInputOnEdgeArgs edgeArgs:
-                    _editor.SelectEdge(edgeArgs.Edge); break;
+                    _selectionManager.SelectEdge(edgeArgs.Edge); break;
                 case EditorInputEvent.EdgeHover when args is EditorInputOnEdgeArgs edgeArgs:
                     DisplayEdgeMovements(edgeArgs.Edge); break;
                 case EditorInputEvent.EdgeUnhover when args is EditorInputOnEdgeArgs edgeArgs:
                     HideEdgeMovements(edgeArgs.Edge); break;
             }
         }
+        
         public void OnUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args)
         {
             switch (uiEvent)
@@ -62,7 +68,7 @@ namespace signallerMap.Scripts.editor
                     CreateSignalBetweenSelected(); break;
             }
         }
-
+        
         private void CreateAndLogMovementBetweenSelected()
         {
             MapMovement movement = CreateMovementBetweenSelected();
@@ -76,19 +82,8 @@ namespace signallerMap.Scripts.editor
         {
             MapMovement movement = CreateMovementBetweenSelected();
             if (movement == null) return;
-            MapNode node = movement.GetNode();
-            if (node == null) return;
-
-            string prefix = node.Prefix;
-            if (!_editor.SignalIds.ContainsKey(prefix)) _editor.SignalIds[prefix] = 1;
-            int serial = _editor.SignalIds[node.Prefix];
-
-            MapSignal signal = new()
-            {
-               Id = prefix + serial.ToString(),
-               Node = node,
-               Movement = movement
-            };
+            
+            MapSignal signal = MapFactory.CreateMapSignal(movement);
 
             var command = new CreateSignalCommand(_editor, signal);
             CommandManager.ExecuteCommand(command);
@@ -96,16 +91,15 @@ namespace signallerMap.Scripts.editor
 
         private MapMovement CreateMovementBetweenSelected()
         {
-            if (selectedEdges.Count < 2) return null;
-            if (selectedEdges[0] == null
+            if (selectedEdges.Count < 2
+            || selectedEdges[0] == null
             || selectedEdges[1] == null
             || selectedEdges[0] == selectedEdges[1]) return null;
 
-            MapMovement movement = new()
-            {
-                from = selectedEdges[1],
-                to = selectedEdges[0]
-            };
+            MapMovement movement = MapFactory.CreateMapMovement(
+                from: selectedEdges[1],
+                to: selectedEdges[0]
+            );
 
             return movement;
         }
@@ -144,8 +138,6 @@ namespace signallerMap.Scripts.editor
             foreach (MapEdge _edge in edges)
                 if (selectedEdges.Contains(_edge)) break;
                 else _editor.mapGrapher.ChangeEdgeColor(_edge, color);
-        }
-
-        
+        }       
     }
 }

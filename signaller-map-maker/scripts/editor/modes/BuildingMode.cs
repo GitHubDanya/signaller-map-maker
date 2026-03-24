@@ -13,16 +13,18 @@ namespace signallerMap.Scripts.editor
         // This mode is responsible for creating, removing and manipulating map objects.
 
         private Editor _editor;
+        private EditorSelectionManager _selectionManager;
         private List<MapNode> selectedNodes;
         private List<MapEdge> selectedEdges;
         
         internal BuildingMode(Editor editor)
         {
             _editor = editor;
-            _editor.SetSelectableNodeCount(2);
-            _editor.SetSelectableEdgeCount(1);
-            selectedNodes = editor.SelectedNodes;
-            selectedEdges = editor.SelectedEdges;
+            _selectionManager = _editor.selectionManager;
+            _selectionManager.SetSelectableNodeCount(2);
+            _selectionManager.SetSelectableEdgeCount(1);
+            selectedNodes = _selectionManager.SelectedNodes;
+            selectedEdges = _selectionManager.SelectedEdges;
 
             MapGrapher grapher = _editor.mapGrapher;
             GrapherColors grapherColors = new()
@@ -41,9 +43,9 @@ namespace signallerMap.Scripts.editor
                 case EditorInputEvent.RMBClick when args is EditorInputMouseClickArgs clickArgs:
                     MouseClick(clickArgs.Position); break;
                 case EditorInputEvent.NodeClick when args is EditorInputOnNodeArgs nodeArgs:
-                    _editor.SelectNode(nodeArgs.Node); break;
+                    _selectionManager.SelectNode(nodeArgs.Node); break;
                 case EditorInputEvent.EdgeClick when args is EditorInputOnEdgeArgs edgeArgs:
-                    _editor.SelectEdge(edgeArgs.Edge); break;
+                    _selectionManager.SelectEdge(edgeArgs.Edge); break;
             }
         }
 
@@ -54,7 +56,7 @@ namespace signallerMap.Scripts.editor
                 case EditorUiEvent.NodeDeleteButtonPressed:
                     DeleteNode(); break;
                 case EditorUiEvent.EdgeCreateButtonPressed when args is EditorUiCreateEdgeArgs edgeArgs:
-                    uiCreateEdge(edgeArgs); break;
+                    CreateEdge(edgeArgs); break;
                 case EditorUiEvent.EdgeDeleteButtonPressed:
                     DeleteEdge(); break;
             }
@@ -67,31 +69,12 @@ namespace signallerMap.Scripts.editor
 
             if (existingNode != null) return;
 
-            MapNode node = CreateNodeFromPosition(position);
+            MapNode node = MapFactory.CreateMapNode(position);
 
             CreateNodeCommand command = new(_editor, node);
             CommandManager.ExecuteCommand(command);
             
-            _editor.SelectNode(node);
-        }
-        
-        private MapNode CreateNodeFromPosition(Vector2 position)
-        {
-            _editor.RefreshCurrentNodeID();
-            
-            string prefix = _editor.NextNodePrefix;
-            if (!_editor.NodeIds.ContainsKey(prefix)) _editor.NodeIds[prefix] = 1;
-            int serial = _editor.NodeIds[_editor.NextNodePrefix];
-
-            MapNode node = new()
-            {
-                Serial = serial,
-                Prefix = prefix,
-                Id = prefix + serial.ToString(),
-                Position = position
-            };
-
-            return node;
+            _selectionManager.SelectNode(node);
         }
 
         private void DeleteNode(MapNode node = null)
@@ -103,33 +86,19 @@ namespace signallerMap.Scripts.editor
             CommandManager.ExecuteCommand(command);
         }
 
-        private void uiCreateEdge(EditorUiCreateEdgeArgs args)
+        public void CreateEdge(EditorUiCreateEdgeArgs args)
         {
             if (selectedNodes[0] == null || selectedNodes.Count < 1 || selectedNodes[1] == null) return;
-            if (int.TryParse(args.EdgeLength, out int el) == false || int.TryParse(args.EdgeSpeed, out int esl) == false) return;
-            CreateEdge(selectedNodes[0], selectedNodes[1], el, esl, args.IsStump);
-        }
+            if (int.TryParse(args.EdgeLength, out int el) == false
+            || int.TryParse(args.EdgeSpeed, out int esl) == false) return;
 
-        public void CreateEdge(MapNode from, MapNode to, int length, int maxSpeed, bool stumps = false)
-        {
-            int fromId = from.Serial;
-            int toId = to.Serial;
-            string id = from.Prefix + Math.Min(fromId, toId) + Math.Max(fromId, toId);
-            if (from.Prefix != to.Prefix) id += 'N';
-
-            MapEdge edge = new MapEdge()
-            {
-                Id = id,
-                From = from,
-                To = to,
-                Length = length,
-                MaxSpeed = maxSpeed
-            };
+            MapEdge edge = MapFactory.CreateMapEdge
+            (from: selectedNodes[0], to: selectedNodes[1], length: el, maxSpeed: esl);
 
             var command = new CreateEdgeCommand(_editor, edge);
             CommandManager.ExecuteCommand(command);
 
-            _editor.SelectEdge(edge);
+            _selectionManager.SelectEdge(edge);
         }
 
         private void DeleteEdge(MapEdge edge = null)

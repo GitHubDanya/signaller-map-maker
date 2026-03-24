@@ -80,6 +80,7 @@ namespace signallerMap.Scripts.Graphics
             if (edges.Count > 0 && edges[0]?.Sprite != null) edges[0].Sprite.Color = colors.SelectedEdgeColor;
             if (edges.Count > 1 && edges[1]?.Sprite != null) edges[1].Sprite.Color = colors.SecondSelectedEdgeColor;
         }
+        
         public void SelectEdge(MapEdge edge)
         {
             if (edge == null || !IsInstanceValid(edge.Sprite)) return;
@@ -187,11 +188,6 @@ namespace signallerMap.Scripts.Graphics
 
             signal.Sprite = sprite;
             signalsContainer.AddChild(sprite);
-        }
-
-        public void DrawPlatform(MapStationPlatform platform)
-        {
-            
         }
 
         // public void LoadStumps()
