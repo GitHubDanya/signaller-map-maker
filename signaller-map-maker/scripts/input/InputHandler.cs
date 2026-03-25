@@ -10,8 +10,6 @@ namespace signallerMap.Scripts.Input
     {
         Editor _editor;
         MapGrapher mapGrapher;
-        private Vector2 _clickStartPosition;
-        private float _clickThreshold = 10.0f; // If moved more than this, it's a drag, not a draw
 
         public override void _Ready()
         {
@@ -26,37 +24,8 @@ namespace signallerMap.Scripts.Input
 
         private void HandleInput(InputEvent @event)
         {
-            // if (@event is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
-            // {
-            //     if (mouseButton.Pressed)
-            //     {
-            //         _clickStartPosition = mouseButton.GlobalPosition;
-            //     }
-            //     else
-            //     {
-            //         float dragDistance = mouseButton.GlobalPosition.DistanceTo(_clickStartPosition);
-                    
-            //         if (dragDistance < _clickThreshold)
-            //         {
-            //             MouseClicked();
-                        
-            //         }
-            //     }
-            // }
-            
             if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed)
-            {
-                
-                if (mouseButton.ButtonIndex == MouseButton.Right)
-                {
-                    MouseClicked(true);
-                }
-                else if (mouseButton.ButtonIndex == MouseButton.Left)
-                {
-                    //MouseClicked(false);
-                }
-            }
-            
+                MouseClicked(mouseButton.ButtonIndex == MouseButton.Right);
             else if (@event.IsActionPressed("undo"))
                 CommandManager.Undo();
             else if (@event.IsActionPressed("redo"))
@@ -73,12 +42,11 @@ namespace signallerMap.Scripts.Input
 
         private void MouseClicked(bool right = false)
         {
-            Vector2 mousePos = mapGrapher.ToLocal(GetGlobalMousePosition());
-            Vector2 nodePos = new Vector2(
-                (float)Math.Round(mousePos.X / 25f) * 25f,
-                (float)Math.Round(mousePos.Y / 25f) * 25f
-            );
-            if (right) _editor.RMBClickEvent(nodePos); else _editor.LMBClickEvent(nodePos);
+            Vector2 pos = mapGrapher.ToLocal(GetGlobalMousePosition());
+
+            _editor.FireInputEvent
+            (right ? EditorInputEvent.RMBClick : EditorInputEvent.LMBClick,
+            new EditorInputMouseClickArgs() { Position = pos } );
         }
     }
 }

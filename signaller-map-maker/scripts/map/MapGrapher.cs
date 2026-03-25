@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using signallerMap.Scripts.Data;
 using signallerMap.Scripts.editor;
+using System.ComponentModel;
 
 namespace signallerMap.Scripts.Graphics
 {
@@ -63,13 +64,13 @@ namespace signallerMap.Scripts.Graphics
                 {
                     if (mouse.ButtonIndex == MouseButton.Left)
                     {
-                        _editor.EdgeClick(edge);
+                        _editor.FireInputEvent(EditorInputEvent.EdgeClick, new EditorInputOnEdgeArgs { Edge = edge });
                     }
                 }
             };
 
-            line.MouseEntered += () => _editor.MouseEnterEdgeEvent(edge);
-            line.MouseExited += () => _editor.MouseExitEdgeEvent(edge);
+            line.MouseEntered += () => _editor.FireInputEvent(EditorInputEvent.EdgeHover, new EditorInputOnEdgeArgs { Edge = edge });
+            line.MouseExited += () => _editor.FireInputEvent(EditorInputEvent.EdgeUnhover, new EditorInputOnEdgeArgs { Edge = edge });
 
             edge.Sprite = line;
             edgesContainer.AddChild(line);
@@ -131,8 +132,11 @@ namespace signallerMap.Scripts.Graphics
             area.InputEvent += (viewport, @event, shapeIdx) =>
             {
                 if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
-                    _editor.NodeClick(node);
+                    _editor.FireInputEvent(EditorInputEvent.NodeClick, new EditorInputOnNodeArgs { Node = node });
             };
+
+            area.MouseEntered += () => _editor.FireInputEvent(EditorInputEvent.NodeHover, new EditorInputOnNodeArgs { Node = node });
+            area.MouseExited += () => _editor.FireInputEvent(EditorInputEvent.NodeUnhover, new EditorInputOnNodeArgs { Node = node });
 
             nodesContainer.AddChild(sprite);
         }
@@ -161,13 +165,7 @@ namespace signallerMap.Scripts.Graphics
             MapNode node = movement.GetNode();
             MapNode sourceNode = movement.GetSourceNode();
 
-            Texture2D texture = signal.State switch
-            {
-                SignalState.Danger => dangerSignalTexture,
-                SignalState.DoubleYellow => preliminaryCautionSignalTexture,
-                SignalState.Caution => cautionSignalTexture,
-                _ => proceedSignalTexture
-            };
+            Texture2D texture = GetTextureForSignalState(signal.State);
 
             Vector2 direction = (node.Position - sourceNode.Position).Normalized();
             Vector2 position = node.Position - (direction * SignalXOffset);
@@ -188,6 +186,37 @@ namespace signallerMap.Scripts.Graphics
 
             signal.Sprite = sprite;
             signalsContainer.AddChild(sprite);
+        }
+
+        public void SelectSignal(MapSignal signal)
+        {
+            if (signal.Sprite == null) return;
+            signal.Sprite.Modulate = new Color(10f, 10f, 10f);
+        }
+
+        public void DeselectSignal(MapSignal signal)
+        {
+            if (signal.Sprite == null) return;
+            signal.Sprite.Modulate = Colors.White;
+        }
+
+        private Texture2D GetTextureForSignalState(SignalState state)
+        {
+            return state switch
+            {
+                SignalState.Danger => dangerSignalTexture,
+                SignalState.DoubleYellow => preliminaryCautionSignalTexture,
+                SignalState.Caution => cautionSignalTexture,
+                _ => proceedSignalTexture
+            };
+        }
+
+        public void SetSignalState(MapSignal signal, SignalState state)
+        {
+            if (signal.Sprite == null) return;
+
+            Texture2D texture = GetTextureForSignalState(state);
+            signal.Sprite.Texture = texture;
         }
 
         // public void LoadStumps()

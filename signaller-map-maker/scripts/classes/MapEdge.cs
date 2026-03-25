@@ -18,6 +18,14 @@ namespace signallerMap.Scripts
         public ColorRect Sprite { get; set; }
         public double Length { get; set; }
         public double MaxSpeed { get; set; }
+
+        public MapNode GetSharedNode(MapEdge other)
+        {
+            if (other == null) return null;
+            if (other.From == To) return other.From;
+            if (From == other.To) return other.To;
+            return null;
+        }
     }
 
     

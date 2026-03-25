@@ -21,10 +21,15 @@ namespace signallerMap.Scripts.editor
         public IEditorMode editorMode;
         public EditorSelectionManager selectionManager;
 
+        internal Editor()
+        {
+            selectionManager = new();
+        }
+
         public override void _Ready()
         {
+            selectionManager.Initialize(mapGrapher);
             nodeContainer = GetNode<Node2D>("/root/Map/MapGrapher/NodeContainer");
-            selectionManager = new(mapGrapher);
             SetEditorMode(new BuildingMode(this));
         }
 
@@ -39,29 +44,10 @@ namespace signallerMap.Scripts.editor
             editorMode = mode;
         }
 
-        private void FireInputEvent(EditorInputEvent e, EditorInputEventArgs args)
-        { editorMode.OnInputEvent(e, args); }
-
-        public void LMBClickEvent(Vector2 position)
-        { FireInputEvent(EditorInputEvent.LMBClick, new EditorInputMouseClickArgs { Position = position }); }
-        public void RMBClickEvent(Vector2 position)
-        { FireInputEvent(EditorInputEvent.RMBClick, new EditorInputMouseClickArgs { Position = position }); }
-        public void NodeClick(MapNode node)
-        { FireInputEvent(EditorInputEvent.NodeClick, new EditorInputOnNodeArgs { Node = node }); }
-        public void EdgeClick(MapEdge edge)
-        { FireInputEvent(EditorInputEvent.EdgeClick, new EditorInputOnEdgeArgs { Edge = edge }); }
-        public void SignalClick(MapSignal signal)
-        { FireInputEvent(EditorInputEvent.SignalClick, new EditorInputOnSignalArgs { Signal = signal}); }
-        public void MouseEnterNodeEvent(MapNode node)
-        { FireInputEvent(EditorInputEvent.NodeHover, new EditorInputOnNodeArgs { Node = node }); }
-        public void MouseExitNodeEvent(MapNode node)
-        { FireInputEvent(EditorInputEvent.NodeUnhover, new EditorInputOnNodeArgs { Node = node }); }
-        public void MouseEnterEdgeEvent(MapEdge edge)
-        { FireInputEvent(EditorInputEvent.EdgeHover, new EditorInputOnEdgeArgs { Edge = edge }); }
-         public void MouseExitEdgeEvent(MapEdge edge)
-         { FireInputEvent(EditorInputEvent.EdgeUnhover, new EditorInputOnEdgeArgs { Edge = edge });}
-        public void FireUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args = null)
-        { editorMode.OnUiEvent(uiEvent, args); }
+        public void FireInputEvent(EditorInputEvent e, EditorInputEventArgs args) =>
+        editorMode.OnInputEvent(e, args);
+        public void FireUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args = null) =>
+        editorMode.OnUiEvent(uiEvent, args);
         
         public void CreateNode(MapNode node)
         {
@@ -118,7 +104,7 @@ namespace signallerMap.Scripts.editor
             movement.GetNode()?.Movements.Add(movement);
         }
 
-        public void DeleteNodeMovement(MapMovement movement)
+        public void DeleteMovement(MapMovement movement)
         {
             if (movement == null) return;
             movement.GetNode()?.Movements.Remove(movement);
@@ -131,6 +117,12 @@ namespace signallerMap.Scripts.editor
 
             MapData.Signals.Add(signal);
             mapGrapher.DrawSignal(signal);
+        }
+
+        public void CycleSignal(MapSignal signal)
+        {
+            signal.CycleSignal();
+            mapGrapher.SetSignalState(signal, signal.State);
         }
 
         public void DeleteSignal(MapSignal signal)
@@ -155,91 +147,111 @@ namespace signallerMap.Scripts.editor
 
     internal class EditorSelectionManager
     {
-        public List<MapNode> SelectedNodes = new();
-        public List<MapEdge> SelectedEdges = new();
-        public int SelectableNodeCount { get; private set; } = 2;
-        public int SelectableEdgeCount { get; private set; } = 2;
+        public SelectionState<MapNode> Nodes { get; private set; }
+        public SelectionState<MapEdge> Edges { get; private set; }
+        public SelectionState<MapSignal> Signals { get; private set; }
+        public event Action SelectionChanged;
         private MapGrapher mapGrapher;
 
-        internal EditorSelectionManager(MapGrapher grapher)
+        public void Initialize(MapGrapher grapher)
         {
             mapGrapher = grapher;
+            Nodes = new(2, mapGrapher.DeselectNode);
+            Edges = new(2, mapGrapher.DeselectEdge);
+            Signals = new(1, mapGrapher.DeselectSignal);
         }
 
         public void SelectNode(MapNode node)
-        {
-            if (node == null) return;
-            
-            SelectedNodes.Insert(0, node);
-            if (SelectedNodes.Count > SelectableNodeCount)
-            {
-                MapNode removed = SelectedNodes[^1];
-                mapGrapher.DeselectNode(removed);
-                SelectedNodes.RemoveAt(SelectedNodes.Count - 1);
-            }
-
-            mapGrapher.SelectNodePair(SelectedNodes);
-        }
-
+        { Select(node, Nodes, () => mapGrapher.SelectNodePair(Nodes.Items)); }
         public void SelectEdge(MapEdge edge)
-        {
-            if (edge == null) return;
-            
-            SelectedEdges.Insert(0, edge);
-            if (SelectedEdges.Count > SelectableEdgeCount)
-            {
-                MapEdge removed = SelectedEdges[^1];
-                mapGrapher.DeselectEdge(removed);
-                SelectedEdges.RemoveAt(SelectedEdges.Count - 1);
-            }
-            
-            mapGrapher.SelectEdgePair(SelectedEdges);
-        }
-
+        { Select(edge, Edges, () => mapGrapher.SelectEdgePair(Edges.Items)); }
+        public void SelectSignal(MapSignal signal)
+        { Select(signal, Signals, () => mapGrapher.SelectSignal(Signals.Items[0])); }
         public void DeselectNode(MapNode node)
-        {
-            if (node == null) return;
-            if (SelectedNodes.Remove(node))
-                mapGrapher.DeselectNode(node);
-        }
-
+        { Deselect(node, Nodes); }
         public void DeselectEdge(MapEdge edge)
-        {
-            if (edge == null) return;
-            if (SelectedEdges.Remove(edge))
-                mapGrapher.DeselectEdge(edge);
-        }
-
+        { Deselect(edge, Edges); }
+        public void DeselectSignal(MapSignal signal)
+        { Deselect(signal, Signals); }
         public void SetSelectableNodeCount(int count)
-        {
-            SelectableNodeCount = count;
-
-            while (SelectedNodes.Count > SelectableNodeCount)
-            {
-                MapNode removed = SelectedNodes[^1];
-                mapGrapher.DeselectNode(removed);
-                SelectedNodes.RemoveAt(SelectedNodes.Count - 1);
-            }
-        }
-
+        { SetSelectableCount(count, Nodes); }
         public void SetSelectableEdgeCount(int count)
-        {
-            SelectableEdgeCount = count;
+        { SetSelectableCount(count, Edges); }
+        public void SetSelectableSignalCount(int count)
+        { SetSelectableCount(count, Signals); }
 
-            while (SelectedEdges.Count > SelectableEdgeCount)
-            {
-                MapEdge removed = SelectedEdges[^1];
-                mapGrapher.DeselectEdge(removed);
-                SelectedEdges.RemoveAt(SelectedEdges.Count - 1);
-            }
+
+        private void Select<T>
+        (T item, SelectionState<T> ss, Action onUpdate)
+        where T : class
+        {
+            if (item == null) return;
+
+            ss.Items.Insert(0, item);
+            ss.Prune();
+
+            onUpdate();
+            SelectionChanged?.Invoke();
         }
 
+        private void Deselect<T>
+        (T item, SelectionState<T> ss)
+        where T : class
+        {
+            if (item == null) return;
+            ss.Remove(item);
+        }
+
+        private void SetSelectableCount<T>
+        (int targetCount, SelectionState<T> ss)
+        where T : class
+        {
+            ss.Limit = targetCount;
+            ss.Prune();
+        }
+ 
+        internal class SelectionState<T> where T : class
+        {
+            public List<T> Items { get; } = new();
+            public int Limit { get; set; } = 2;
+            private readonly Action<T> _onDeselect;
+            public SelectionState(int limit, Action<T> onDeselect)
+            {
+                Limit = limit;
+                _onDeselect = onDeselect;
+            }
+
+            public void Prune()
+            {
+                while (Items.Count > Limit)
+                {
+                    T removed = Items[^1];
+                    _onDeselect(removed);
+                    Items.RemoveAt(Items.Count - 1);
+                }
+            }
+
+            public void Remove(T item)
+            {
+                if (Items.Remove(item))
+                {
+                    _onDeselect?.Invoke(item);
+                }
+            }
+        }
+        public void DeselectNodes()
+        { foreach (MapNode node in Nodes.Items.ToList()) { DeselectNode(node); } }
+        public void DeselectEdges()
+        { foreach (MapEdge edge in Edges.Items.ToList()) { DeselectEdge(edge); } }
+        public void DeselectSignals()
+        { foreach (MapSignal signal in Signals.Items.ToList()) { DeselectSignal(signal); } }
+
+        
         public void ClearSelection()
         {
-            foreach (MapEdge edge in SelectedEdges) { mapGrapher.DeselectEdge(edge); }
-            foreach (MapNode node in SelectedNodes) { mapGrapher.DeselectNode(node); }
-            SelectedEdges.Clear();
-            SelectedNodes.Clear();
+            DeselectNodes();
+            DeselectEdges();
+            DeselectSignals();
         }
     }
 }

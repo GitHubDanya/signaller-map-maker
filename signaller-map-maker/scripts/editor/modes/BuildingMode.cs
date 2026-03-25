@@ -23,8 +23,8 @@ namespace signallerMap.Scripts.editor
             _selectionManager = _editor.selectionManager;
             _selectionManager.SetSelectableNodeCount(2);
             _selectionManager.SetSelectableEdgeCount(1);
-            selectedNodes = _selectionManager.SelectedNodes;
-            selectedEdges = _selectionManager.SelectedEdges;
+            selectedNodes = _selectionManager.Nodes.Items;
+            selectedEdges = _selectionManager.Edges.Items;
 
             MapGrapher grapher = _editor.mapGrapher;
             GrapherColors grapherColors = new()
@@ -41,7 +41,7 @@ namespace signallerMap.Scripts.editor
             switch (inputEvent)
             {
                 case EditorInputEvent.RMBClick when args is EditorInputMouseClickArgs clickArgs:
-                    MouseClick(clickArgs.Position); break;
+                    CreateNode(clickArgs.Position); break;
                 case EditorInputEvent.NodeClick when args is EditorInputOnNodeArgs nodeArgs:
                     _selectionManager.SelectNode(nodeArgs.Node); break;
                 case EditorInputEvent.EdgeClick when args is EditorInputOnEdgeArgs edgeArgs:
@@ -62,18 +62,20 @@ namespace signallerMap.Scripts.editor
             }
         }
 
-        public void MouseClick(Vector2 position)
+        public void CreateNode(Vector2 position)
         {
             var childrenNodes = _editor.nodeContainer.GetChildren().Where(c => c is Sprite2D).Cast<Sprite2D>();
-            MapNode existingNode = MapData.Nodes.FirstOrDefault(n => n.Position.IsEqualApprox(position));
+            Vector2 nodePos = new Vector2(
+                (float)Math.Round(position.X / 25f) * 25f,
+                (float)Math.Round(position.Y / 25f) * 25f);
+            MapNode existingNode = MapData.Nodes.FirstOrDefault(n => n.Position.IsEqualApprox(nodePos));
 
             if (existingNode != null) return;
 
-            MapNode node = MapFactory.CreateMapNode(position);
+            MapNode node = MapFactory.CreateMapNode(nodePos);
 
-            CreateNodeCommand command = new(_editor, node);
-            CommandManager.ExecuteCommand(command);
-            
+            CommandManager.ExecuteCommand(MapCommand.CreateNode(_editor, node));
+
             _selectionManager.SelectNode(node);
         }
 
@@ -82,8 +84,7 @@ namespace signallerMap.Scripts.editor
             if (node == null && selectedNodes.Count > 0) node = selectedNodes[0];
             if (node == null) return;
 
-            var command = new DeleteNodeCommand(_editor, node);
-            CommandManager.ExecuteCommand(command);
+            CommandManager.ExecuteCommand(MapCommand.DeleteNode(_editor, node));
         }
 
         public void CreateEdge(EditorUiCreateEdgeArgs args)
@@ -95,8 +96,7 @@ namespace signallerMap.Scripts.editor
             MapEdge edge = MapFactory.CreateMapEdge
             (from: selectedNodes[0], to: selectedNodes[1], length: el, maxSpeed: esl);
 
-            var command = new CreateEdgeCommand(_editor, edge);
-            CommandManager.ExecuteCommand(command);
+            CommandManager.ExecuteCommand(MapCommand.CreateEdge(_editor, edge));
 
             _selectionManager.SelectEdge(edge);
         }
@@ -105,7 +105,7 @@ namespace signallerMap.Scripts.editor
         {
             if (edge == null && selectedEdges.Count > 0) edge = selectedEdges[0];
             if (edge == null) return;
-            CommandManager.ExecuteCommand(new DeleteEdgeCommand(_editor, selectedEdges[0]));
+            CommandManager.ExecuteCommand(MapCommand.DeleteEdge(_editor, selectedEdges.ElementAtOrDefault(0)));
         }
     }
 }

@@ -8,25 +8,34 @@
 follow_viewport_enabled = true
 script = ExtResource("1_0fbet")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=513475418 node_paths=PackedStringArray("nodeLabel", "nodePrefixField", "nodeUpdateButton", "nodeDeleteButton", "edgeSelectedLabel", "edgeFromLabel", "edgeToLabel", "edgeCreateButton", "edgeIsStumpCheckbox", "edgeLength", "edgeSpeedLimit", "edgeDeleteButton", "jsonLoadButton", "jsonSaveButton")]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=513475418 node_paths=PackedStringArray("nodeLabel", "nodePrefixField", "nodeDeleteButton", "edgeSelectedLabel", "edgeFromLabel", "edgeToLabel", "edgeCreateButton", "edgeIsStumpCheckbox", "edgeLength", "edgeSpeedLimit", "edgeDeleteButton", "movementsContainer", "movementTemplate", "movementCreateSignalButton", "signalSelectedLabel", "signalCycleStateButton", "signalDeleteButton", "stationNameField", "stationPlatformAboveButton", "stationPlatformBelowButton", "stationDeleteButton", "jsonLoadButton", "jsonSaveButton")]
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 script = ExtResource("2_62e2m")
-nodeLabel = NodePath("MarginContainer/NodeProperties/NodePanel/SelectedNode")
-nodePrefixField = NodePath("MarginContainer/NodeProperties/NodePanel/NodePrefix")
-nodeUpdateButton = NodePath("MarginContainer/NodeProperties/NodePanel/HBoxContainer/Update")
-nodeDeleteButton = NodePath("MarginContainer/NodeProperties/NodePanel/HBoxContainer/DeleteButton")
-edgeSelectedLabel = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/SelectedEdge")
-edgeFromLabel = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel/FromNode")
-edgeToLabel = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel/ToNode")
-edgeCreateButton = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/CreateButton")
-edgeIsStumpCheckbox = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/IsStump")
-edgeLength = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties/Length")
-edgeSpeedLimit = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties/Speedlimit")
-edgeDeleteButton = NodePath("MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/DeleteButton")
-jsonLoadButton = NodePath("MarginContainer/NodeProperties/SavePanel/LoadJSON")
-jsonSaveButton = NodePath("MarginContainer/NodeProperties/SavePanel/SaveJSON")
+nodeLabel = NodePath("MarginContainer/Contents/NodePanel/SelectedNode")
+nodePrefixField = NodePath("MarginContainer/Contents/NodePanel/NodePrefix")
+nodeDeleteButton = NodePath("MarginContainer/Contents/NodePanel/HBoxContainer/DeleteButton")
+edgeSelectedLabel = NodePath("MarginContainer/Contents/EdgePanel/Contents/LeftSide/SelectedEdge")
+edgeFromLabel = NodePath("MarginContainer/Contents/EdgePanel/Contents/LeftSide/TargetNodesPanel/FromNode")
+edgeToLabel = NodePath("MarginContainer/Contents/EdgePanel/Contents/LeftSide/TargetNodesPanel/ToNode")
+edgeCreateButton = NodePath("MarginContainer/Contents/EdgePanel/Contents/LeftSide/CreateButton")
+edgeIsStumpCheckbox = NodePath("MarginContainer/Contents/EdgePanel/Contents/RightSide/IsStump")
+edgeLength = NodePath("MarginContainer/Contents/EdgePanel/Contents/RightSide/Properties/Length")
+edgeSpeedLimit = NodePath("MarginContainer/Contents/EdgePanel/Contents/RightSide/Properties/Speedlimit")
+edgeDeleteButton = NodePath("MarginContainer/Contents/EdgePanel/Contents/RightSide/DeleteButton")
+movementsContainer = NodePath("MarginContainer/Contents/MovementPanel/PanelContainer/ScrollContainer/VBoxContainer")
+movementTemplate = NodePath("MarginContainer/Contents/MovementPanel/templateLabel")
+movementCreateSignalButton = NodePath("MarginContainer/Contents/MovementPanel/CreateSignalButton")
+signalSelectedLabel = NodePath("MarginContainer/Contents/SignalPanel/SelectedSignal")
+signalCycleStateButton = NodePath("MarginContainer/Contents/SignalPanel/VBoxContainer/CycleStateButton")
+signalDeleteButton = NodePath("MarginContainer/Contents/SignalPanel/VBoxContainer/DeleteButton")
+stationNameField = NodePath("MarginContainer/Contents/StationPanel/StationName")
+stationPlatformAboveButton = NodePath("MarginContainer/Contents/StationPanel/HBoxContainer/CreatePlatformAboveButton")
+stationPlatformBelowButton = NodePath("MarginContainer/Contents/StationPanel/HBoxContainer/CreatePlatformBelowButton")
+stationDeleteButton = NodePath("MarginContainer/Contents/StationPanel/DeleteButton")
+jsonLoadButton = NodePath("MarginContainer/Contents/SavePanel/LoadJSON")
+jsonSaveButton = NodePath("MarginContainer/Contents/SavePanel/SaveJSON")
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=57261731]
 layout_mode = 2
@@ -35,14 +44,19 @@ theme_override_constants/margin_top = 7
 theme_override_constants/margin_right = 7
 theme_override_constants/margin_bottom = 7
 
-[node name="NodeProperties" type="HBoxContainer" parent="PanelContainer/MarginContainer" unique_id=917989425]
+[node name="Contents" type="HBoxContainer" parent="PanelContainer/MarginContainer" unique_id=917989425]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="NodePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties" unique_id=391654261]
+[node name="Spacer2" type="Control" parent="PanelContainer/MarginContainer/Contents" unique_id=463649930]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NodePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=391654261]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=2117601094]
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/NodePanel" unique_id=2117601094]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
 theme_override_font_sizes/font_size = 16
@@ -50,12 +64,12 @@ text = "Node"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=1853396015]
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/Contents/NodePanel" unique_id=1853396015]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="SelectedNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=1334852025]
+[node name="SelectedNode" type="Label" parent="PanelContainer/MarginContainer/Contents/NodePanel" unique_id=1334852025]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7624033, 0.76240385, 0.76240337, 1)
 theme_override_font_sizes/font_size = 12
@@ -63,34 +77,27 @@ text = "NaN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NodePrefix" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=256449856]
+[node name="NodePrefix" type="LineEdit" parent="PanelContainer/MarginContainer/Contents/NodePanel" unique_id=256449856]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_font_sizes/font_size = 12
 placeholder_text = "prefix"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel" unique_id=637552739]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/Contents/NodePanel" unique_id=637552739]
 layout_mode = 2
 
-[node name="Update" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel/HBoxContainer" unique_id=318586139]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 12
-text = "Update
-"
-
-[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/NodePanel/HBoxContainer" unique_id=586845470]
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/Contents/NodePanel/HBoxContainer" unique_id=586845470]
+custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.98466235, 0.49880713, 0.43196452, 1)
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 12
-text = "Delete"
+text = "Delete Node"
 
-[node name="EdgePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties" unique_id=2109431056]
+[node name="EdgePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=2109431056]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=942084918]
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/EdgePanel" unique_id=942084918]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
 theme_override_font_sizes/font_size = 16
@@ -98,14 +105,19 @@ text = "Edge"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Contents" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel" unique_id=1707631370]
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/Contents/EdgePanel" unique_id=1637526395]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Contents" type="HBoxContainer" parent="PanelContainer/MarginContainer/Contents/EdgePanel" unique_id=1707631370]
 layout_mode = 2
 
-[node name="LeftSide" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents" unique_id=1026234114]
+[node name="LeftSide" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents" unique_id=1026234114]
 layout_mode = 2
 alignment = 1
 
-[node name="SelectedEdge" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=794037494]
+[node name="SelectedEdge" type="Label" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide" unique_id=794037494]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7624033, 0.76240385, 0.76240337, 1)
 theme_override_font_sizes/font_size = 12
@@ -113,81 +125,216 @@ text = "NaN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Spacer2" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=1199155813]
+[node name="Spacer2" type="Control" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide" unique_id=1199155813]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="TargetNodesPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=485093232]
+[node name="TargetNodesPanel" type="HBoxContainer" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide" unique_id=485093232]
 layout_mode = 2
 
-[node name="FromNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel" unique_id=1691773263]
+[node name="FromNode" type="Label" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide/TargetNodesPanel" unique_id=1691773263]
 custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 text = "FROM"
 horizontal_alignment = 1
 
-[node name="ToNode" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/TargetNodesPanel" unique_id=1483006000]
+[node name="ToNode" type="Label" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide/TargetNodesPanel" unique_id=1483006000]
 custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 text = "TO"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=1898139747]
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide" unique_id=1898139747]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CreateButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide" unique_id=859179607]
+[node name="CreateButton" type="Button" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide" unique_id=859179607]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 12
 text = "Create"
 
-[node name="RightSide" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents" unique_id=1205717839]
+[node name="RightSide" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents" unique_id=1205717839]
 layout_mode = 2
 
-[node name="IsStump" type="CheckBox" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide" unique_id=1602899603]
+[node name="IsStump" type="CheckBox" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/RightSide" unique_id=1602899603]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_font_sizes/font_size = 9
 text = "Stump?"
 
-[node name="Properties" type="HBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide" unique_id=18943648]
+[node name="Properties" type="HBoxContainer" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/RightSide" unique_id=18943648]
 layout_mode = 2
 
-[node name="Length" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties" unique_id=2022982935]
+[node name="Length" type="LineEdit" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/RightSide/Properties" unique_id=2022982935]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_font_sizes/font_size = 12
 placeholder_text = "Length"
 
-[node name="Speedlimit" type="LineEdit" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/Properties" unique_id=803371535]
+[node name="Speedlimit" type="LineEdit" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/RightSide/Properties" unique_id=803371535]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
 theme_override_font_sizes/font_size = 12
 placeholder_text = "Speed Limit"
 
-[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide" unique_id=1219451770]
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/Contents/EdgePanel/Contents/RightSide" unique_id=1219451770]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9843137, 0.49803922, 0.43137255, 1)
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 12
-text = "Delete"
+text = "Delete Edge"
 
-[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/NodeProperties" unique_id=14629666]
+[node name="Divider" type="PanelContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=1097349851]
+custom_minimum_size = Vector2(2, 0)
+layout_mode = 2
+
+[node name="MovementPanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=1401066868]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/MovementPanel" unique_id=1856956007]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
+theme_override_font_sizes/font_size = 16
+text = "Movements"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="templateLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/MovementPanel" unique_id=225370410]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68307734, 0.6830774, 0.68307734, 1)
+theme_override_font_sizes/font_size = 12
+text = "XD001<>XD002"
+horizontal_alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/Contents/MovementPanel" unique_id=718376563]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="SavePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/NodeProperties" unique_id=1136421883]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/Contents/MovementPanel/PanelContainer" unique_id=757804750]
+custom_minimum_size = Vector2(175, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents/MovementPanel/PanelContainer/ScrollContainer" unique_id=30956779]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="CreateSignalButton" type="Button" parent="PanelContainer/MarginContainer/Contents/MovementPanel" unique_id=808198450]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Create Signal"
+
+[node name="SignalPanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=1439773689]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/NodeProperties/SavePanel" unique_id=1970104443]
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/SignalPanel" unique_id=378631460]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
+theme_override_font_sizes/font_size = 16
+text = "Signal"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/Contents/SignalPanel" unique_id=1459025529]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SelectedSignal" type="Label" parent="PanelContainer/MarginContainer/Contents/SignalPanel" unique_id=1225744952]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7624033, 0.76240385, 0.76240337, 1)
+theme_override_font_sizes/font_size = 12
+text = "NaN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents/SignalPanel" unique_id=428569616]
+layout_mode = 2
+
+[node name="CycleStateButton" type="Button" parent="PanelContainer/MarginContainer/Contents/SignalPanel/VBoxContainer" unique_id=687506611]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Cycle"
+
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/Contents/SignalPanel/VBoxContainer" unique_id=2092204455]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98466235, 0.49880713, 0.43196452, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Delete Signal"
+
+[node name="StationPanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=1636156395]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/StationPanel" unique_id=274270283]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
+theme_override_font_sizes/font_size = 16
+text = "Station"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/Contents/StationPanel" unique_id=346984096]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="StationName" type="LineEdit" parent="PanelContainer/MarginContainer/Contents/StationPanel" unique_id=333939191]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+placeholder_text = "Station Name"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/Contents/StationPanel" unique_id=45028631]
+layout_mode = 2
+alignment = 1
+
+[node name="CreatePlatformAboveButton" type="Button" parent="PanelContainer/MarginContainer/Contents/StationPanel/HBoxContainer" unique_id=989732942]
+custom_minimum_size = Vector2(73, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Plat. Above"
+
+[node name="CreatePlatformBelowButton" type="Button" parent="PanelContainer/MarginContainer/Contents/StationPanel/HBoxContainer" unique_id=1325209917]
+custom_minimum_size = Vector2(73, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Plat.Below"
+
+[node name="DeleteButton" type="Button" parent="PanelContainer/MarginContainer/Contents/StationPanel" unique_id=241858209]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98466235, 0.49880713, 0.43196452, 1)
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 12
+text = "Delete Station"
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/Contents" unique_id=14629666]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SavePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=1136421883]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/Contents/SavePanel" unique_id=1970104443]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
 theme_override_font_sizes/font_size = 16
@@ -195,13 +342,13 @@ text = "Saving"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LoadJSON" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/SavePanel" unique_id=670553501]
+[node name="LoadJSON" type="Button" parent="PanelContainer/MarginContainer/Contents/SavePanel" unique_id=670553501]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_vertical = 3
 text = "Load JSON"
 
-[node name="SaveJSON" type="Button" parent="PanelContainer/MarginContainer/NodeProperties/SavePanel" unique_id=738446364]
+[node name="SaveJSON" type="Button" parent="PanelContainer/MarginContainer/Contents/SavePanel" unique_id=738446364]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_vertical = 3
@@ -209,6 +356,6 @@ text = "Save JSON"
 
 [node name="InputHandler" type="Node2D" parent="." unique_id=329217872 node_paths=PackedStringArray("uiDeleteEdgeButton", "uiDeleteNodeButton", "uiCreateEdgeButton")]
 script = ExtResource("3_qtu10")
-uiDeleteEdgeButton = NodePath("../PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/RightSide/DeleteButton")
-uiDeleteNodeButton = NodePath("../PanelContainer/MarginContainer/NodeProperties/NodePanel/HBoxContainer/DeleteButton")
-uiCreateEdgeButton = NodePath("../PanelContainer/MarginContainer/NodeProperties/EdgePanel/Contents/LeftSide/CreateButton")
+uiDeleteEdgeButton = NodePath("../PanelContainer/MarginContainer/Contents/EdgePanel/Contents/RightSide/DeleteButton")
+uiDeleteNodeButton = NodePath("../PanelContainer/MarginContainer/Contents/NodePanel/HBoxContainer/DeleteButton")
+uiCreateEdgeButton = NodePath("../PanelContainer/MarginContainer/Contents/EdgePanel/Contents/LeftSide/CreateButton")

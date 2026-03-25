@@ -41,7 +41,6 @@ namespace signallerMap.Scripts
     public enum EditorUiEvent
     {
         NodePrefixFieldChanged,
-        NodeUpdateButtonPressed,
         NodeDeleteButtonPressed,
         EdgeCreateButtonPressed,
         EdgeStumpCheckboxToggled,
@@ -50,6 +49,12 @@ namespace signallerMap.Scripts
         EdgeDeleteButtonPressed,
         CreateMovementPressed,
         CreateSignalPressed,
+        CycleSignalPressed,
+        DeleteSignalPressed,
+        StationSelected,
+        StationPlatformAbovePressed,
+        StationPlatformBelowPressed,
+        StationDeletePressed,
         JsonLoadButtonPressed,
         JsonSaveButtonPressed,
     }

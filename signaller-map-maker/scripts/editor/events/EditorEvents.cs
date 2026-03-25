@@ -11,12 +11,7 @@ namespace signallerMap.Scripts.editor
         public string EdgeLength;
         public string EdgeSpeed;
         public bool IsStump;
-    }
-
-    internal class EditorUiDeleteEdgeArgs : EditorUiEventArgs
-    {
-        public string id;
-    }
+    }   
 
     internal class EditorInputMouseClickArgs : EditorInputEventArgs
     {

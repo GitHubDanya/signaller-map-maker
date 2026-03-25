@@ -16,6 +16,7 @@ namespace signallerMap.Scripts.editor
         private EditorSelectionManager _selectionManager;
         private List<MapEdge> selectedEdges;
         private List<MapNode> selectedNodes;
+        private List<MapSignal> selectedSignals;
         private Color movementInColor = Color.FromHtml("E55949");
         private Color movementOutColor = Color.FromHtml("4DE248");
         private Color movementInAndOutColor = Color.FromHtml("F2C34D");
@@ -26,8 +27,10 @@ namespace signallerMap.Scripts.editor
             _selectionManager = editor.selectionManager;
             _selectionManager.SetSelectableNodeCount(1);
             _selectionManager.SetSelectableEdgeCount(2);
-            selectedNodes = _selectionManager.SelectedNodes;
-            selectedEdges = _selectionManager.SelectedEdges;
+            _selectionManager.SetSelectableSignalCount(1);
+            selectedNodes = _selectionManager.Nodes.Items;
+            selectedEdges = _selectionManager.Edges.Items;
+            selectedSignals = _selectionManager.Signals.Items;
 
             MapGrapher grapher = _editor.mapGrapher;
             GrapherColors grapherColors = new()
@@ -40,21 +43,18 @@ namespace signallerMap.Scripts.editor
             grapher.colors = grapherColors;
         }
         
-        public void MouseClick(Vector2 position)
-        {
-            _selectionManager.ClearSelection();
-        }
-        
         public void OnInputEvent(EditorInputEvent inputEvent, EditorInputEventArgs args)
         {
             switch (inputEvent)
             {
                 case EditorInputEvent.EdgeClick when args is EditorInputOnEdgeArgs edgeArgs:
-                    _selectionManager.SelectEdge(edgeArgs.Edge); break;
+                    _selectionManager.DeselectSignals(); SelectEdge(edgeArgs.Edge); break;
                 case EditorInputEvent.EdgeHover when args is EditorInputOnEdgeArgs edgeArgs:
                     DisplayEdgeMovements(edgeArgs.Edge); break;
                 case EditorInputEvent.EdgeUnhover when args is EditorInputOnEdgeArgs edgeArgs:
                     HideEdgeMovements(edgeArgs.Edge); break;
+                case EditorInputEvent.SignalClick when args is EditorInputOnSignalArgs signalArgs:
+                    _selectionManager.SelectSignal(signalArgs.Signal); break;
             }
         }
         
@@ -63,30 +63,32 @@ namespace signallerMap.Scripts.editor
             switch (uiEvent)
             {
                 case EditorUiEvent.CreateMovementPressed when args is null:
-                    CreateAndLogMovementBetweenSelected(); break;
+                    CommandManager.ExecuteCommand(MapCommand.CreateMovement(_editor, CreateMovementBetweenSelected())); break;
                 case EditorUiEvent.CreateSignalPressed when args is null:
-                    CreateSignalBetweenSelected(); break;
+                    CommandManager.ExecuteCommand(MapCommand.CreateSignal(_editor, CreateSignalBetweenSelected())); break;
+                case EditorUiEvent.CycleSignalPressed when args is null:
+                    CycleSelectedSignal(); break;
+                case EditorUiEvent.DeleteSignalPressed when args is null:
+                    CommandManager.ExecuteCommand(MapCommand.DeleteSignal(_editor, GetSelectedSignal())); break;
             }
         }
         
-        private void CreateAndLogMovementBetweenSelected()
+        private void SelectEdge(MapEdge edge)
         {
-            MapMovement movement = CreateMovementBetweenSelected();
-            if (movement == null) return;
+            _selectionManager.SelectEdge(edge);
 
-            var command = new CreateNodeMovementCommand(_editor, movement);
-            CommandManager.ExecuteCommand(command);
-        }
-
-        private void CreateSignalBetweenSelected()
-        {
-            MapMovement movement = CreateMovementBetweenSelected();
-            if (movement == null) return;
-            
-            MapSignal signal = MapFactory.CreateMapSignal(movement);
-
-            var command = new CreateSignalCommand(_editor, signal);
-            CommandManager.ExecuteCommand(command);
+            // Select in-between elements if two adjacent edges were selected
+            if (_selectionManager.Edges.Items.Count == 2)
+            {
+                MapEdge sourceEdge = selectedEdges.ElementAtOrDefault(1);
+                if (sourceEdge == null) return;
+                MapNode node = edge.GetSharedNode(sourceEdge);
+                if (node == null) return;
+                MapSignal signal = node.Signals.FirstOrDefault(s => s.Movement.from == sourceEdge);
+                
+                _selectionManager.SelectNode(node);
+                if (signal != null) _selectionManager.SelectSignal(signal);
+            }
         }
 
         private MapMovement CreateMovementBetweenSelected()
@@ -102,6 +104,24 @@ namespace signallerMap.Scripts.editor
             );
 
             return movement;
+        }
+
+        private MapSignal CreateSignalBetweenSelected()
+        {
+            MapMovement movement = CreateMovementBetweenSelected();
+            if (movement == null) return null;
+            MapNode node = movement.GetNode();
+            if (node == null || node.Signals.Any(s => s.Movement.from == movement.from)) return null;
+            
+            if (!node.Movements.Contains(movement))
+                CommandManager.ExecuteCommand(MapCommand.CreateMovement(_editor, movement));;
+
+            return MapFactory.CreateMapSignal(movement);
+        }
+
+        private MapSignal GetSelectedSignal()
+        {
+            return _selectionManager.Signals.Items.ElementAtOrDefault(1);
         }
 
         private void DisplayEdgeMovements(MapEdge edge)
@@ -131,6 +151,13 @@ namespace signallerMap.Scripts.editor
             
             foreach (MapEdge _edge in connectedEdges)
             if (!selectedEdges.Contains(_edge)) _editor.mapGrapher.DeselectEdge(_edge);
+        }
+
+        private void CycleSelectedSignal()
+        {
+            List<MapSignal> selectedSignals = _selectionManager.Signals.Items;
+            if (selectedSignals.Count <= 0) return;
+            _editor.CycleSignal(selectedSignals[0]);
         }
 
         private void colorEdges(List<MapEdge> edges, Color color)

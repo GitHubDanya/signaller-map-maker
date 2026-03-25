@@ -25,5 +25,12 @@ namespace signallerMap.Scripts
             if (movement.from != _movement.from) return;
             _movement = movement;
         }
+
+        public void CycleSignal()
+        {
+            SignalState[] values = (SignalState[])Enum.GetValues(typeof(SignalState));
+            int index = Array.IndexOf(values, State);
+            State = values[(index + 1) % values.Length];
+        }
     }
 }

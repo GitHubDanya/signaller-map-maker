@@ -24,18 +24,15 @@ namespace signallerMap.Scripts.Data
 
         private JsonMapNode MapNodeToJSON(MapNode node)
         {
-            return new()
-            {
-                id = node.Id,
-                position = new[] { node.Position.X, node.Position.Y }
-            };
+            return new(node.Id, new[] {node.Position.X, node.Position.Y});
         }
         
         private MapNode JSONToMapNode(JsonMapNode jsonNode)
         {
-            if (jsonNode.id.Length < 2) jsonNode.id = "XX000";
-            int serial = int.Parse(jsonNode.id.Substring(2));
-            string prefix = jsonNode.id.Substring(0, 2);
+            string id = jsonNode.id;
+            if (jsonNode.id.Length < 2) id = "XX000";
+            int serial = int.Parse(id.Substring(2));
+            string prefix = id.Substring(0, 2);
             return new()
             {
                 Serial = serial,
@@ -66,15 +63,14 @@ namespace signallerMap.Scripts.Data
 
         private JsonMapEdge MapEdgeToJSON(MapEdge edge)
         {
-            return new()
-            {
-                id = edge.Id,
-                station_id = edge.StationId ?? string.Empty,
-                from = edge.From.Id,
-                to = edge.To.Id,
-                length = edge.Length,
-                max_speed = edge.MaxSpeed
-            };
+            return new(
+                id: edge.Id,
+                station_id: edge.StationId ?? string.Empty,
+                from: edge.From.Id,
+                to: edge.To.Id,
+                length: edge.Length,
+                max_speed: edge.MaxSpeed
+            );
         }
 
         private MapEdge JSONToMapEdge(JsonMapEdge jsonEdge)
@@ -118,11 +114,10 @@ namespace signallerMap.Scripts.Data
         
         public JsonMapMovement MapMovementToJSON(MapMovement movement)
         {
-            return new()
-            {
-                from = movement.from.Id,
-                to = movement.to.Id
-            };
+            return new(
+                from: movement.from.Id,
+                to: movement.to.Id
+            );
         }
 
         public List<MapSignal> ConvertToMapSignals(List<JsonMapSignal> signals)
@@ -159,13 +154,12 @@ namespace signallerMap.Scripts.Data
         
         public JsonMapSignal MapSignalToJSON(MapSignal signal)
         {
-            return new()
-            {
-                id = signal.Id,
-                node = signal.Node.Id,
-                edge = signal.Movement.from.Id,
-                state = signal.State.ToString().ToLower()
-            };
+            return new(
+                id: signal.Id,
+                node: signal.Node.Id,
+                edge: signal.Movement.from.Id,
+                state: signal.State.ToString().ToLower()
+            );
         } 
     }
 }
