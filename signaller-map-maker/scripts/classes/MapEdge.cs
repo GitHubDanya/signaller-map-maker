@@ -17,6 +17,7 @@ namespace signallerMap.Scripts
         public MapStationPlatform Platform { get; set; }
         public ColorRect Sprite { get; set; }
         public double Length { get; set; }
+        public int Zindex { get; set; }
         public double MaxSpeed { get; set; }
 
         public MapNode GetSharedNode(MapEdge other)

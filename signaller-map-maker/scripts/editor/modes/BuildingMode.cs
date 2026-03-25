@@ -91,10 +91,11 @@ namespace signallerMap.Scripts.editor
         {
             if (selectedNodes[0] == null || selectedNodes.Count < 1 || selectedNodes[1] == null) return;
             if (int.TryParse(args.EdgeLength, out int el) == false
+            || int.TryParse(args.EdgeZindex, out int z) == false 
             || int.TryParse(args.EdgeSpeed, out int esl) == false) return;
 
             MapEdge edge = MapFactory.CreateMapEdge
-            (from: selectedNodes[0], to: selectedNodes[1], length: el, maxSpeed: esl);
+            (from: selectedNodes[0], to: selectedNodes[1], length: el, zIndex: Math.Max(1, z), maxSpeed: esl);
 
             CommandManager.ExecuteCommand(MapCommand.CreateEdge(_editor, edge));
 

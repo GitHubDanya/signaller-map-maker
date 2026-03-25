@@ -9,6 +9,7 @@ namespace signallerMap.Scripts.editor
     internal class EditorUiCreateEdgeArgs : EditorUiEventArgs
     {
         public string EdgeLength;
+        public string EdgeZindex;
         public string EdgeSpeed;
         public bool IsStump;
     }   

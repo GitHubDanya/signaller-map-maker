@@ -37,7 +37,7 @@ namespace signallerMap.Scripts.Data
             return node;
         }
 
-        public static MapEdge CreateMapEdge(MapNode from, MapNode to, int length, int maxSpeed, bool stumps = false)
+        public static MapEdge CreateMapEdge(MapNode from, MapNode to, int length, int zIndex, int maxSpeed, bool stumps = false)
         {
             if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length), "Length cannot be 0 or less.");
             if (maxSpeed <= 0) throw new ArgumentOutOfRangeException(nameof(maxSpeed), "Speed limit cannot be 0 or less");
@@ -53,6 +53,7 @@ namespace signallerMap.Scripts.Data
                 From = from,
                 To = to,
                 Length = length,
+                Zindex = zIndex,
                 MaxSpeed = maxSpeed
             };
 

@@ -19,6 +19,7 @@ namespace signallerMap.Scripts.UI
         [Export] private Label edgeFromLabel { get; set; }
         [Export] private Label edgeToLabel { get; set; }
         [Export] private Button edgeCreateButton { get; set; }
+        [Export] private LineEdit edgeZindex { get; set; }
         [Export] private CheckBox edgeIsStumpCheckbox { get; set; }
         [Export] private LineEdit edgeLength { get; set; }
         [Export] private LineEdit edgeSpeedLimit { get; set; }
@@ -79,6 +80,7 @@ namespace signallerMap.Scripts.UI
         { _editor.FireUiEvent(EditorUiEvent.EdgeCreateButtonPressed,
             new EditorUiCreateEdgeArgs()
             { EdgeLength = edgeLength.Text,
+            EdgeZindex = edgeZindex.Text,
             EdgeSpeed = edgeSpeedLimit.Text,
             IsStump = edgeIsStumpCheckbox.ButtonPressed }); }
         private void uiEdgeStumpCheckboxToggled(bool state) {}
