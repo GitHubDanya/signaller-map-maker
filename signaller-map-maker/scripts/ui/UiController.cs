@@ -12,6 +12,7 @@ namespace signallerMap.Scripts.UI
     {
 
         // UI Elements
+        [Export] private HBoxContainer BuildModeUi { get; set; }
         [Export] private Label nodeLabel { get; set; }
         [Export] private LineEdit nodePrefixField { get; set; }
         [Export] private Button nodeDeleteButton { get; set; }
@@ -24,16 +25,17 @@ namespace signallerMap.Scripts.UI
         [Export] private LineEdit edgeLength { get; set; }
         [Export] private LineEdit edgeSpeedLimit { get; set; }
         [Export] private Button edgeDeleteButton { get; set; }
+        [Export] private LineEdit stationNameField { get; set; }
+        [Export] private Button stationPlatformAboveButton { get; set; }
+        [Export] private Button stationPlatformBelowButton { get; set; }
+        [Export] private Button stationDeleteButton { get; set; }
+        [Export] private HBoxContainer MovementModeUi { get; set; }
         [Export] private VBoxContainer movementsContainer { get; set; }
         [Export] private Label movementTemplate { get; set; }
         [Export] private Button movementCreateSignalButton { get; set; }
         [Export] private Label signalSelectedLabel { get; set; }
         [Export] private Button signalCycleStateButton { get; set; }
         [Export] private Button signalDeleteButton { get; set; }
-        [Export] private LineEdit stationNameField { get; set; }
-        [Export] private Button stationPlatformAboveButton { get; set; }
-        [Export] private Button stationPlatformBelowButton { get; set; }
-        [Export] private Button stationDeleteButton { get; set; }
         [Export] private Button jsonLoadButton { get; set; }
         [Export] private Button jsonSaveButton { get; set; }
 
@@ -68,7 +70,8 @@ namespace signallerMap.Scripts.UI
             _editor = GetNode<Editor>("/root/Map/Editor");
             _sm = _editor.selectionManager;
             _fileManager = GetNode<FileManager>("/root/Map/FileManager");
-            
+
+            _editor.editorModeChanged += (mode) => LoadUiForEditorMode(mode);
             _sm.SelectionChanged += OnSelectionChange;
         }
 
@@ -77,35 +80,43 @@ namespace signallerMap.Scripts.UI
         private void uiNodeDeleteButtonPressed() =>
         _editor.FireUiEvent(EditorUiEvent.NodeDeleteButtonPressed);
         private void uiEdgeCreateButtonPressed()
-        { _editor.FireUiEvent(EditorUiEvent.EdgeCreateButtonPressed,
+        {
+            _editor.FireUiEvent(EditorUiEvent.EdgeCreateButtonPressed,
             new EditorUiCreateEdgeArgs()
-            { EdgeLength = edgeLength.Text,
-            EdgeZindex = edgeZindex.Text,
-            EdgeSpeed = edgeSpeedLimit.Text,
-            IsStump = edgeIsStumpCheckbox.ButtonPressed }); }
-        private void uiEdgeStumpCheckboxToggled(bool state) {}
+            {
+                EdgeLength = edgeLength.Text,
+                EdgeZindex = edgeZindex.Text,
+                EdgeSpeed = edgeSpeedLimit.Text,
+                IsStump = edgeIsStumpCheckbox.ButtonPressed
+            });
+        }
+        private void uiEdgeStumpCheckboxToggled(bool state) { }
         private void uiEdgeLengthFieldChanged(string text)
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeSpeedFieldChanged(string text)
         { if (!new Regex("^[0-9]*$").IsMatch(text)) edgeLength.Text = string.Empty; }
         private void uiEdgeDeleteButtonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.EdgeDeleteButtonPressed); 
+        _editor.FireUiEvent(EditorUiEvent.EdgeDeleteButtonPressed);
         private void uiSignalCreateButtonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.CreateSignalPressed); 
+        _editor.FireUiEvent(EditorUiEvent.CreateSignalPressed);
         private void uiSignalCycleButonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.CycleSignalPressed); 
+        _editor.FireUiEvent(EditorUiEvent.CycleSignalPressed);
         private void uiSignalDeleteButtonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.DeleteSignalPressed); 
+        _editor.FireUiEvent(EditorUiEvent.DeleteSignalPressed);
         private void uiStationNameFieldChanged(string text) =>
-        _editor.FireUiEvent(EditorUiEvent.StationSelected); 
+        _editor.FireUiEvent(EditorUiEvent.StationSelected);
         private void uiStationPlatformAboveButtonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.StationPlatformAbovePressed); 
+        _editor.FireUiEvent(EditorUiEvent.StationPlatformAbovePressed,
+            new EditorUiStationEvent()
+            { StationName = stationNameField.Text, Side = PlatformVerticalAlignment.Above });
         private void uiStationPlatformBelowButtonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.StationPlatformBelowPressed); 
+        _editor.FireUiEvent(EditorUiEvent.StationPlatformBelowPressed,
+            new EditorUiStationEvent()
+            { StationName = stationNameField.Text, Side = PlatformVerticalAlignment.Below });
         private void uiStationDeleteButtonPressed() =>
-        _editor.FireUiEvent(EditorUiEvent.StationDeletePressed); 
-        private void uiJsonLoadButtonPressed() => _fileManager.LoadData(); 
-        private void uiJsonSaveButtonPressed() => _fileManager.SaveData(); 
+        _editor.FireUiEvent(EditorUiEvent.StationDeletePressed);
+        private void uiJsonLoadButtonPressed() => _fileManager.LoadData();
+        private void uiJsonSaveButtonPressed() => _fileManager.SaveData();
 
         private void OnSelectionChange()
         {
@@ -122,8 +133,8 @@ namespace signallerMap.Scripts.UI
         }
 
         private void loadMovementList(List<MapMovement> movements)
-        { 
-            foreach (Node child in movementsContainer.GetChildren()) 
+        {
+            foreach (Node child in movementsContainer.GetChildren())
                 child.QueueFree();
 
             foreach (MapMovement movement in movements)
@@ -133,6 +144,15 @@ namespace signallerMap.Scripts.UI
                 movementLabel.Visible = true;
                 movementsContainer.AddChild(movementLabel);
             }
+        }
+
+        public void LoadUiForEditorMode(IEditorMode mode)
+        {
+            BuildModeUi.Visible = false;
+            MovementModeUi.Visible = false;
+
+            if (mode is BuildingMode) BuildModeUi.Visible = true;
+            else if (mode is MovementMode) MovementModeUi.Visible = true;
         }
 
         private void LightUpdateUi()

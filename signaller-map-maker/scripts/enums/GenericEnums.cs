@@ -1,5 +1,3 @@
-using System;
-
 namespace signallerMap.Scripts
 {
     public enum SignalState
@@ -7,20 +5,26 @@ namespace signallerMap.Scripts
         Proceed = 0,
         DoubleYellow = 1,
         Caution = 2,
-        Danger = 3
+        Danger = 3,
     }
 
     public enum TrainAccelerationState
     {
         Braking,
         Idle,
-        Accelerating
+        Accelerating,
     }
 
-    public enum SelectionType
+    public enum EditorMode
     {
         BuildingMode,
-        MovementMode
+        MovementMode,
+    }
+
+    public enum PlatformVerticalAlignment
+    {
+        Above,
+        Below,
     }
 
     public enum EditorInputEvent
@@ -35,7 +39,7 @@ namespace signallerMap.Scripts
         EdgeUnhover,
         SignalClick,
         SignalHover,
-        SignalUnhover
+        SignalUnhover,
     }
 
     public enum EditorUiEvent

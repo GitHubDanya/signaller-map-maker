@@ -1,10 +1,5 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace signallerMap.Scripts
 {
@@ -14,7 +9,7 @@ namespace signallerMap.Scripts
         public string StationId { get; set; }
         public MapNode From { get; set; }
         public MapNode To { get; set; }
-        public MapStationPlatform Platform { get; set; }
+        public List<MapPlatform> Platforms { get; set; } = new();
         public ColorRect Sprite { get; set; }
         public double Length { get; set; }
         public int Zindex { get; set; }
@@ -29,5 +24,5 @@ namespace signallerMap.Scripts
         }
     }
 
-    
+
 }

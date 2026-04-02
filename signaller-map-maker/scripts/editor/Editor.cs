@@ -1,10 +1,9 @@
-using Godot;
-using signallerMap.Scripts.Graphics;
-using signallerMap.Scripts.Data;
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Godot;
+using signallerMap.Scripts.Data;
+using signallerMap.Scripts.Graphics;
 
 namespace signallerMap.Scripts.editor
 {
@@ -13,12 +12,29 @@ namespace signallerMap.Scripts.editor
         // This is the main Editor class. User input is directed here to be manipulated.
         // Input is never linked to direct methods in this class, instead it is routed through
         // the current EDITOR MODE to handle custom logic for same actions.
+        //
+        // To add a feature, a signal must first be piped into either FireInputEvent or
+        // FireUiEvent. Then, the corresponding EDITOR MODE for the event should catch
+        // that signal in an On..Event function, do internal business logic, and create
+        // a CommandManager call with the corresponding action.
 
-        [Export] public MapGrapher mapGrapher;
-        [Export] public Node2D nodeContainer;
-        [Export] public Node2D edgeContainer;
-        [Export] public Node2D signalContainer;
+        [Export]
+        public MapGrapher mapGrapher;
+
+        [Export]
+        public Node2D labelContainer;
+
+        [Export]
+        public Node2D nodeContainer;
+
+        [Export]
+        public Node2D edgeContainer;
+
+        [Export]
+        public Node2D signalContainer;
+
         public IEditorMode editorMode;
+        public Action<IEditorMode> editorModeChanged;
         public EditorSelectionManager selectionManager;
 
         internal Editor()
@@ -42,38 +58,44 @@ namespace signallerMap.Scripts.editor
         {
             selectionManager.ClearSelection();
             editorMode = mode;
+            editorModeChanged(mode);
         }
 
         public void FireInputEvent(EditorInputEvent e, EditorInputEventArgs args) =>
-        editorMode.OnInputEvent(e, args);
+            editorMode.OnInputEvent(e, args);
+
         public void FireUiEvent(EditorUiEvent uiEvent, EditorUiEventArgs args = null) =>
-        editorMode.OnUiEvent(uiEvent, args);
-        
+            editorMode.OnUiEvent(uiEvent, args);
+
         public void CreateNode(MapNode node)
         {
-            if (MapData.Nodes.Contains(node) || nodeContainer.HasNode(node.Id)) return;
-            
+            if (MapData.Nodes.Contains(node) || nodeContainer.HasNode(node.Id))
+                return;
+
             MapData.Nodes.Add(node);
             mapGrapher.DrawNode(node);
-        } 
+        }
 
         public void DeleteNode(MapNode node)
         {
-            if (node == null) return;
-            while (node.Edges.Count > 0) DeleteEdge(node.Edges[0]);
+            if (node == null)
+                return;
+            while (node.Edges.Count > 0)
+                DeleteEdge(node.Edges[0]);
 
             selectionManager.DeselectNode(node);
 
             if (GodotObject.IsInstanceValid(node.Sprite))
                 node.Sprite.QueueFree();
-                
+
             MapData.Nodes.Remove(node);
         }
 
         public void CreateEdge(MapEdge edge)
         {
             MapEdge existingEdge = MapData.Edges.FirstOrDefault(e => e.Id == edge.Id);
-            if (existingEdge != null) DeleteEdge(existingEdge);
+            if (existingEdge != null)
+                DeleteEdge(existingEdge);
 
             MapData.Edges.Add(edge);
             mapGrapher.DrawEdge(edge);
@@ -84,10 +106,23 @@ namespace signallerMap.Scripts.editor
 
         public void DeleteEdge(MapEdge edge)
         {
-            if (edge == null) return;
+            if (edge == null)
+                return;
 
             edge.To?.Edges?.Remove(edge);
             edge.From?.Edges?.Remove(edge);
+
+            List<MapPlatform> platforms = edge.Platforms.ToList();
+
+            foreach (MapPlatform platform in platforms)
+            {
+                if (platform == null) continue;
+
+                MapStation station = platform.Station;
+                DeletePlatform(platform);
+
+                if (station.Platforms.Count == 0) DeleteStation(station);
+            }
 
             selectionManager.DeselectEdge(edge);
 
@@ -99,21 +134,27 @@ namespace signallerMap.Scripts.editor
 
         public void CreateMovement(MapMovement movement)
         {
-            if (movement == null || movement.from == null || movement.to == null) return;
-            if (MapData.Nodes.SelectMany(n => n.Movements).Contains(movement)) return;
+            if (movement == null || movement.from == null || movement.to == null)
+                return;
+            if (MapData.Nodes.SelectMany(n => n.Movements).Contains(movement))
+                return;
             movement.GetNode()?.Movements.Add(movement);
         }
 
         public void DeleteMovement(MapMovement movement)
         {
-            if (movement == null) return;
+            if (movement == null)
+                return;
             movement.GetNode()?.Movements.Remove(movement);
         }
 
         public void CreateSignal(MapSignal signal)
         {
-            if (MapData.Signals.Contains(signal) ||
-            signalContainer.GetNodeOrNull<Sprite2D>(signal.Id) != null) return;
+            if (
+                    MapData.Signals.Contains(signal)
+                    || signalContainer.GetNodeOrNull<Sprite2D>(signal.Id) != null
+               )
+                return;
 
             MapData.Signals.Add(signal);
             mapGrapher.DrawSignal(signal);
@@ -127,7 +168,8 @@ namespace signallerMap.Scripts.editor
 
         public void DeleteSignal(MapSignal signal)
         {
-            if (signal == null) return;
+            if (signal == null)
+                return;
 
             signal.Node.Signals.Remove(signal);
 
@@ -137,10 +179,70 @@ namespace signallerMap.Scripts.editor
             MapData.Signals.Remove(signal);
         }
 
+        public void CreateStation(MapStation station)
+        {
+            if (station == null || MapData.Stations.Contains(station))
+                return;
+            MapData.Stations.Add(station);
+        }
+
+        public void DeleteStation(MapStation station)
+        {
+            if (station == null)
+                return;
+
+            foreach (MapPlatform platform in station.Platforms)
+                DeletePlatform(platform);
+
+            MapData.Stations.Remove(station);
+        }
+
+        public void CreatePlatform(MapPlatform platform)
+        {
+            if (
+                    platform == null
+                    || platform.Station == null
+               )
+                return;
+            platform.Station.Platforms.Add(platform);
+            platform.Edge.Platforms.Add(platform);
+            mapGrapher.DrawPlatform(platform);
+            mapGrapher.UpdateStationSprite(platform.Station);
+            MapData.Platforms.Add(platform);
+        }
+
+        public void DeletePlatform(MapPlatform platform)
+        {
+            if (platform == null)
+                return;
+            if (platform.Edge != null)
+                platform.Edge.Platforms.Remove(platform);
+
+            if (platform.Station != null && platform.Station.Platforms.Contains(platform))
+                platform.Station.Platforms.Remove((platform));
+
+            if (GodotObject.IsInstanceValid(platform.Sprite))
+                platform.Sprite.QueueFree();
+
+            MapData
+                .Stations.FirstOrDefault(s => s.Platforms.Contains(platform))
+                ?.Platforms.Remove(platform);
+            MapData.Platforms.Remove(platform);
+        }
+
         public void CleanMap()
         {
-            foreach (MapEdge edge in MapData.Edges.ToList()) { DeleteEdge(edge); }
-            foreach (MapNode node in MapData.Nodes.ToList()) { DeleteNode(node); }
+            foreach (MapEdge edge in MapData.Edges.ToList())
+                DeleteEdge(edge);
+            foreach (MapNode node in MapData.Nodes.ToList())
+                DeleteNode(node);
+            foreach (MapStation station in MapData.Stations)
+                DeleteStation(station);
+            foreach (MapPlatform platform in MapData.Platforms)
+                DeletePlatform(platform);
+            foreach (MapSignal signal in MapData.Signals)
+                DeleteSignal(signal);
+
             initialize();
         }
     }
@@ -162,30 +264,55 @@ namespace signallerMap.Scripts.editor
         }
 
         public void SelectNode(MapNode node)
-        { Select(node, Nodes, () => mapGrapher.SelectNodePair(Nodes.Items)); }
-        public void SelectEdge(MapEdge edge)
-        { Select(edge, Edges, () => mapGrapher.SelectEdgePair(Edges.Items)); }
-        public void SelectSignal(MapSignal signal)
-        { Select(signal, Signals, () => mapGrapher.SelectSignal(Signals.Items[0])); }
-        public void DeselectNode(MapNode node)
-        { Deselect(node, Nodes); }
-        public void DeselectEdge(MapEdge edge)
-        { Deselect(edge, Edges); }
-        public void DeselectSignal(MapSignal signal)
-        { Deselect(signal, Signals); }
-        public void SetSelectableNodeCount(int count)
-        { SetSelectableCount(count, Nodes); }
-        public void SetSelectableEdgeCount(int count)
-        { SetSelectableCount(count, Edges); }
-        public void SetSelectableSignalCount(int count)
-        { SetSelectableCount(count, Signals); }
-
-
-        private void Select<T>
-        (T item, SelectionState<T> ss, Action onUpdate)
-        where T : class
         {
-            if (item == null) return;
+            Select(node, Nodes, () => mapGrapher.SelectNodePair(Nodes.Items));
+        }
+
+        public void SelectEdge(MapEdge edge)
+        {
+            Select(edge, Edges, () => mapGrapher.SelectEdgePair(Edges.Items));
+        }
+
+        public void SelectSignal(MapSignal signal)
+        {
+            Select(signal, Signals, () => mapGrapher.SelectSignal(Signals.Items[0]));
+        }
+
+        public void DeselectNode(MapNode node)
+        {
+            Deselect(node, Nodes);
+        }
+
+        public void DeselectEdge(MapEdge edge)
+        {
+            Deselect(edge, Edges);
+        }
+
+        public void DeselectSignal(MapSignal signal)
+        {
+            Deselect(signal, Signals);
+        }
+
+        public void SetSelectableNodeCount(int count)
+        {
+            SetSelectableCount(count, Nodes);
+        }
+
+        public void SetSelectableEdgeCount(int count)
+        {
+            SetSelectableCount(count, Edges);
+        }
+
+        public void SetSelectableSignalCount(int count)
+        {
+            SetSelectableCount(count, Signals);
+        }
+
+        private void Select<T>(T item, SelectionState<T> ss, Action onUpdate)
+            where T : class
+        {
+            if (item == null)
+                return;
 
             ss.Items.Insert(0, item);
             ss.Prune();
@@ -194,27 +321,28 @@ namespace signallerMap.Scripts.editor
             SelectionChanged?.Invoke();
         }
 
-        private void Deselect<T>
-        (T item, SelectionState<T> ss)
-        where T : class
+        private void Deselect<T>(T item, SelectionState<T> ss)
+            where T : class
         {
-            if (item == null) return;
+            if (item == null)
+                return;
             ss.Remove(item);
         }
 
-        private void SetSelectableCount<T>
-        (int targetCount, SelectionState<T> ss)
-        where T : class
+        private void SetSelectableCount<T>(int targetCount, SelectionState<T> ss)
+            where T : class
         {
             ss.Limit = targetCount;
             ss.Prune();
         }
- 
-        internal class SelectionState<T> where T : class
+
+        internal class SelectionState<T>
+            where T : class
         {
             public List<T> Items { get; } = new();
             public int Limit { get; set; } = 2;
             private readonly Action<T> _onDeselect;
+
             public SelectionState(int limit, Action<T> onDeselect)
             {
                 Limit = limit;
@@ -239,14 +367,31 @@ namespace signallerMap.Scripts.editor
                 }
             }
         }
-        public void DeselectNodes()
-        { foreach (MapNode node in Nodes.Items.ToList()) { DeselectNode(node); } }
-        public void DeselectEdges()
-        { foreach (MapEdge edge in Edges.Items.ToList()) { DeselectEdge(edge); } }
-        public void DeselectSignals()
-        { foreach (MapSignal signal in Signals.Items.ToList()) { DeselectSignal(signal); } }
 
-        
+        public void DeselectNodes()
+        {
+            foreach (MapNode node in Nodes.Items.ToList())
+            {
+                DeselectNode(node);
+            }
+        }
+
+        public void DeselectEdges()
+        {
+            foreach (MapEdge edge in Edges.Items.ToList())
+            {
+                DeselectEdge(edge);
+            }
+        }
+
+        public void DeselectSignals()
+        {
+            foreach (MapSignal signal in Signals.Items.ToList())
+            {
+                DeselectSignal(signal);
+            }
+        }
+
         public void ClearSelection()
         {
             DeselectNodes();

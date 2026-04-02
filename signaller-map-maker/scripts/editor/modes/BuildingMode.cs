@@ -1,10 +1,9 @@
-using Godot;
 using System;
-using System.Linq;
-using signallerMap.Scripts.Data;
 using System.Collections.Generic;
+using System.Linq;
+using Godot;
+using signallerMap.Scripts.Data;
 using signallerMap.Scripts.Graphics;
-using System.Xml.Serialization;
 
 namespace signallerMap.Scripts.editor
 {
@@ -16,7 +15,7 @@ namespace signallerMap.Scripts.editor
         private EditorSelectionManager _selectionManager;
         private List<MapNode> selectedNodes;
         private List<MapEdge> selectedEdges;
-        
+
         internal BuildingMode(Editor editor)
         {
             _editor = editor;
@@ -31,7 +30,7 @@ namespace signallerMap.Scripts.editor
             {
                 SelectedNodeColor = Color.FromHtml("ffce1c"),
                 SelectedEdgeColor = Color.FromHtml("fcb653"),
-                SecondSelectedNodeColor = Color.FromHtml("ffde66") 
+                SecondSelectedNodeColor = Color.FromHtml("ffde66"),
             };
             grapher.colors = grapherColors;
         }
@@ -41,11 +40,14 @@ namespace signallerMap.Scripts.editor
             switch (inputEvent)
             {
                 case EditorInputEvent.RMBClick when args is EditorInputMouseClickArgs clickArgs:
-                    CreateNode(clickArgs.Position); break;
+                    CreateNode(clickArgs.Position);
+                    break;
                 case EditorInputEvent.NodeClick when args is EditorInputOnNodeArgs nodeArgs:
-                    _selectionManager.SelectNode(nodeArgs.Node); break;
+                    _selectionManager.SelectNode(nodeArgs.Node);
+                    break;
                 case EditorInputEvent.EdgeClick when args is EditorInputOnEdgeArgs edgeArgs:
-                    _selectionManager.SelectEdge(edgeArgs.Edge); break;
+                    _selectionManager.SelectEdge(edgeArgs.Edge);
+                    break;
             }
         }
 
@@ -54,23 +56,42 @@ namespace signallerMap.Scripts.editor
             switch (uiEvent)
             {
                 case EditorUiEvent.NodeDeleteButtonPressed:
-                    DeleteNode(); break;
-                case EditorUiEvent.EdgeCreateButtonPressed when args is EditorUiCreateEdgeArgs edgeArgs:
-                    CreateEdge(edgeArgs); break;
+                    DeleteNode();
+                    break;
+                case EditorUiEvent.EdgeCreateButtonPressed
+                    when args is EditorUiCreateEdgeArgs edgeArgs:
+                    CreateEdge(edgeArgs);
+                    break;
                 case EditorUiEvent.EdgeDeleteButtonPressed:
-                    DeleteEdge(); break;
+                    DeleteEdge();
+                    break;
+                case EditorUiEvent.StationPlatformAbovePressed
+                    when args is EditorUiStationEvent platformArgs:
+                    CreatePlatform(platformArgs, PlatformVerticalAlignment.Above);
+                    break;
+                case EditorUiEvent.StationPlatformBelowPressed
+                    when args is EditorUiStationEvent platformArgs:
+                    CreatePlatform(platformArgs, PlatformVerticalAlignment.Below);
+                    break;
             }
         }
 
         public void CreateNode(Vector2 position)
         {
-            var childrenNodes = _editor.nodeContainer.GetChildren().Where(c => c is Sprite2D).Cast<Sprite2D>();
+            var childrenNodes = _editor
+                .nodeContainer.GetChildren()
+                .Where(c => c is Sprite2D)
+                .Cast<Sprite2D>();
             Vector2 nodePos = new Vector2(
                 (float)Math.Round(position.X / 25f) * 25f,
-                (float)Math.Round(position.Y / 25f) * 25f);
-            MapNode existingNode = MapData.Nodes.FirstOrDefault(n => n.Position.IsEqualApprox(nodePos));
+                (float)Math.Round(position.Y / 25f) * 25f
+            );
+            MapNode existingNode = MapData.Nodes.FirstOrDefault(n =>
+                n.Position.IsEqualApprox(nodePos)
+            );
 
-            if (existingNode != null) return;
+            if (existingNode != null)
+                return;
 
             MapNode node = MapFactory.CreateMapNode(nodePos);
 
@@ -81,21 +102,32 @@ namespace signallerMap.Scripts.editor
 
         private void DeleteNode(MapNode node = null)
         {
-            if (node == null && selectedNodes.Count > 0) node = selectedNodes[0];
-            if (node == null) return;
+            if (node == null && selectedNodes.Count > 0)
+                node = selectedNodes[0];
+            if (node == null)
+                return;
 
             CommandManager.ExecuteCommand(MapCommand.DeleteNode(_editor, node));
         }
 
         public void CreateEdge(EditorUiCreateEdgeArgs args)
         {
-            if (selectedNodes[0] == null || selectedNodes.Count < 1 || selectedNodes[1] == null) return;
-            if (int.TryParse(args.EdgeLength, out int el) == false
-            || int.TryParse(args.EdgeZindex, out int z) == false 
-            || int.TryParse(args.EdgeSpeed, out int esl) == false) return;
+            if (selectedNodes[0] == null || selectedNodes.Count < 1 || selectedNodes[1] == null)
+                return;
+            if (
+                int.TryParse(args.EdgeLength, out int el) == false
+                || int.TryParse(args.EdgeZindex, out int z) == false
+                || int.TryParse(args.EdgeSpeed, out int esl) == false
+            )
+                return;
 
-            MapEdge edge = MapFactory.CreateMapEdge
-            (from: selectedNodes[0], to: selectedNodes[1], length: el, zIndex: Math.Max(1, z), maxSpeed: esl);
+            MapEdge edge = MapFactory.CreateMapEdge(
+                from: selectedNodes[0],
+                to: selectedNodes[1],
+                length: el,
+                zIndex: Math.Max(1, z),
+                maxSpeed: esl
+            );
 
             CommandManager.ExecuteCommand(MapCommand.CreateEdge(_editor, edge));
 
@@ -104,9 +136,61 @@ namespace signallerMap.Scripts.editor
 
         private void DeleteEdge(MapEdge edge = null)
         {
-            if (edge == null && selectedEdges.Count > 0) edge = selectedEdges[0];
-            if (edge == null) return;
-            CommandManager.ExecuteCommand(MapCommand.DeleteEdge(_editor, selectedEdges.ElementAtOrDefault(0)));
+            if (edge == null && selectedEdges.Count > 0)
+                edge = selectedEdges[0];
+            if (edge == null)
+                return;
+            CommandManager.ExecuteCommand(
+                MapCommand.DeleteEdge(_editor, selectedEdges.ElementAtOrDefault(0))
+            );
+        }
+
+        private MapStation CreateStation(string name)
+        {
+            MapStation station = MapFactory.CreateMapStation(name);
+            if (station == null)
+                return null;
+            CommandManager.ExecuteCommand(
+                MapCommand.CreateStation(_editor, station)
+            );
+            return station;
+        }
+
+        private void DeleteStation(string name)
+        {
+            if (name == null) return;
+            MapStation station = MapData.Stations.FirstOrDefault(s => s.Name == name);
+            if (station == null) return;
+            CommandManager.ExecuteCommand(
+                MapCommand.DeleteStation(_editor, station)
+            );
+        }
+
+        private MapPlatform CreatePlatform(EditorUiStationEvent args, PlatformVerticalAlignment alignment)
+        {
+            if (args.StationName == null || selectedEdges.ElementAtOrDefault(0) == null)
+                return null;
+
+            MapStation station = MapData.Stations.FirstOrDefault(s => s.Name == args.StationName);
+
+            if (station == null)
+                station = CreateStation(args.StationName);
+
+            MapPlatform platform = MapFactory.CreateMapStationPlatform(
+                station.Platforms.Count + 1,
+                selectedEdges[0],
+                station,
+                alignment
+            );
+
+            if (platform == null)
+                return null;
+
+            CommandManager.ExecuteCommand(
+                    MapCommand.CreatePlatform(_editor, platform)
+            );
+
+            return platform;
         }
     }
 }

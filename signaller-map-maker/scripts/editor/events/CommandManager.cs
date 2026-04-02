@@ -1,9 +1,5 @@
-using Godot;
-using Godot.NativeInterop;
 using System;
 using System.Collections.Generic;
-using signallerMap.Scripts.Data;
-using System.Linq;
 
 namespace signallerMap.Scripts.editor
 {
@@ -17,6 +13,14 @@ namespace signallerMap.Scripts.editor
             new MapActionCommand<MapMovement>(m, e.CreateMovement, e.DeleteMovement);
         public static ICommand CreateSignal(Editor e, MapSignal s) =>
             new MapActionCommand<MapSignal>(s, e.CreateSignal, e.DeleteSignal);
+        public static ICommand CreateStation(Editor e, MapStation s) =>
+            new MapActionCommand<MapStation>(s, e.CreateStation, e.DeleteStation);
+        public static ICommand DeleteStation(Editor e, MapStation s) =>
+            new MapActionCommand<MapStation>(s, e.DeleteStation, e.CreateStation);
+        public static ICommand CreatePlatform(Editor e, MapPlatform p) =>
+            new MapActionCommand<MapPlatform>(p, e.CreatePlatform, e.DeletePlatform);
+        public static ICommand DeletePlatform(Editor e, MapPlatform p) =>
+            new MapActionCommand<MapPlatform>(p, e.DeletePlatform, e.CreatePlatform);
         public static ICommand DeleteNode(Editor e, MapNode n) =>
             new MapActionCommand<MapNode>(n, e.DeleteNode, e.CreateNode);
         public static ICommand DeleteEdge(Editor e, MapEdge ed) =>

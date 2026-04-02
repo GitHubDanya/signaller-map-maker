@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace signallerMap.Scripts
 {
@@ -11,13 +7,17 @@ namespace signallerMap.Scripts
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public List<MapStationPlatform> Platforms { get; set; }
+        public List<MapPlatform> Platforms { get; set; }
+        public Label Sprite { get; set; }
     }
 
-    internal partial class MapStationPlatform : Resource
+    internal partial class MapPlatform : Resource
     {
+        public string Id { get; set; }
         public int Number { get; set; }
         public MapEdge Edge { get; set; }
+        public MapStation Station { get; set; }
         public ColorRect Sprite { get; set; }
+        public PlatformVerticalAlignment VerticalAlignment { get; set; }
     }
 }

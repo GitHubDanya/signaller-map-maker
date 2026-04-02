@@ -10,12 +10,13 @@
 [ext_resource type="Texture2D" uid="uid://cnantkpxftwvj" path="res://sprites/signals/doubleyellow.png" id="5_6qsgm"]
 [ext_resource type="Script" uid="uid://3xt2g2aourjd" path="res://scripts/input/InputHandler.cs" id="6_iw27f"]
 [ext_resource type="Texture2D" uid="uid://bq8anejs3tun5" path="res://sprites/signals/green.png" id="6_ooc2g"]
-[ext_resource type="Script" uid="uid://cq5wogrw557hw" path="res://scripts/data/FileManager.cs" id="7_71pa8"]
+[ext_resource type="Script" uid="uid://cxyh2rehrc13" path="res://scripts/data/FileManager.cs" id="7_71pa8"]
 
 [node name="Map" type="Node2D" unique_id=1622036391]
 
-[node name="Editor" parent="." unique_id=1698487867 node_paths=PackedStringArray("mapGrapher", "nodeContainer", "edgeContainer", "signalContainer") instance=ExtResource("1_iw27f")]
+[node name="Editor" parent="." unique_id=1698487867 node_paths=PackedStringArray("mapGrapher", "labelContainer", "nodeContainer", "edgeContainer", "signalContainer") instance=ExtResource("1_iw27f")]
 mapGrapher = NodePath("../MapGrapher")
+labelContainer = NodePath("../MapGrapher/LabelContainer")
 nodeContainer = NodePath("../MapGrapher/NodeContainer")
 edgeContainer = NodePath("../MapGrapher/EdgeContainer")
 signalContainer = NodePath("../MapGrapher/SignalContainer")
@@ -35,6 +36,8 @@ texture = ExtResource("1_c7s6e")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 20000, 20000)
+
+[node name="LabelContainer" type="Node2D" parent="MapGrapher" unique_id=577954479]
 
 [node name="NodeContainer" type="Node2D" parent="MapGrapher" unique_id=1447335525]
 

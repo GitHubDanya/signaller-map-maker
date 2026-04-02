@@ -1,76 +1,112 @@
-using Godot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Godot;
 using signallerMap.Scripts.Data;
 using signallerMap.Scripts.editor;
-using System.ComponentModel;
 
 namespace signallerMap.Scripts.Graphics
 {
     internal partial class MapGrapher : Node2D
     {
-        [Export] Texture2D dangerSignalTexture { get; set; }
-        [Export] Texture2D cautionSignalTexture { get; set; }
-        [Export] Texture2D preliminaryCautionSignalTexture { get; set; }
-        [Export] Texture2D proceedSignalTexture { get; set; }
-        private Node2D edgesContainer;
+        [Export]
+        Texture2D dangerSignalTexture { get; set; }
+
+        [Export]
+        Texture2D cautionSignalTexture { get; set; }
+
+        [Export]
+        Texture2D preliminaryCautionSignalTexture { get; set; }
+
+        [Export]
+        Texture2D proceedSignalTexture { get; set; }
+        private Node2D labelsContainer;
         private Node2D nodesContainer;
+        private Node2D edgesContainer;
         private Node2D signalsContainer;
         private Editor _editor;
         public readonly float LineWidth = 3.5f;
+        public readonly float LineBorderWidth = 4f;
+        public readonly float PlatformWidth = 20f;
         public readonly int StumpLength = 10;
-        public readonly int SignalXOffset = 10;
+        public readonly float SignalXOffset = 10f;
         public readonly float SignalYOffset = 5.5f;
+        public readonly float StationTitleOffset = 50f;
+        public readonly float PlatformOffset = 10f;
         public readonly Color LineColor = Color.FromHtml("FFFFFF");
+        public readonly Color LineBorderColor = Color.FromHtml("202020");
+        public readonly Color PlatformColor = Color.FromHtml("A0A0A0");
         public GrapherColors colors = new();
 
         public override void _Ready()
         {
-            edgesContainer = GetNode<Node2D>("EdgeContainer");
+            labelsContainer = GetNode<Node2D>("LabelContainer");
             nodesContainer = GetNode<Node2D>("NodeContainer");
+            edgesContainer = GetNode<Node2D>("EdgeContainer");
             signalsContainer = GetNode<Node2D>("SignalContainer");
             _editor = GetNode<Editor>("/root/Map/Editor");
         }
 
         public void DrawEdge(MapEdge edge)
         {
-            if (edge.From == null || edge.To == null) return;
-
-            ColorRect line = new ColorRect();
-            line.Color = LineColor;
-            line.ZIndex = 1;
+            if (edge.From == null || edge.To == null)
+                return;
 
             Vector2 startPos = edge.From.Position;
             Vector2 endPos = edge.To.Position;
+            if (startPos.X > endPos.X) (startPos, endPos) = (endPos, startPos);
             Vector2 direction = endPos - startPos;
 
             float length = direction.Length();
             float angle = direction.Angle();
 
-            line.Size = new Vector2(length, LineWidth);
+            ColorRect line = new()
+            {
+                Color = LineColor,
+                ZIndex = edge.Zindex * 2,
+                Size = new Vector2(length, LineWidth),
+                PivotOffset = new Vector2(0, LineWidth / 2f),
+                Position = startPos - new Vector2(0, LineWidth / 2f),
+                Rotation = angle,
+                MouseFilter = Control.MouseFilterEnum.Pass
+            };
 
-            line.PivotOffset = new Vector2(0, LineWidth / 2f);
+            ColorRect border = (ColorRect)line.Duplicate();
+            border.Rotation = 0;
+            border.Size += new Vector2(0, LineBorderWidth);
+            border.Position = new Vector2(0, -LineBorderWidth / 2f);
+            border.Color = LineBorderColor;
+            border.ZIndex = -1;
+            border.ShowBehindParent = true;
+            line.AddChild(border);
 
-            line.Position = startPos - new Vector2(0, LineWidth / 2f);
-            line.Rotation = angle;
-
-            line.MouseFilter = Control.MouseFilterEnum.Pass;
             line.GuiInput += (inputEvent) =>
             {
                 if (inputEvent is InputEventMouseButton mouse && mouse.Pressed)
                 {
                     if (mouse.ButtonIndex == MouseButton.Left)
                     {
-                        _editor.FireInputEvent(EditorInputEvent.EdgeClick, new EditorInputOnEdgeArgs { Edge = edge });
+                        _editor.FireInputEvent(
+                            EditorInputEvent.EdgeClick,
+                            new EditorInputOnEdgeArgs { Edge = edge }
+                        );
                     }
                 }
             };
 
-            line.MouseEntered += () => _editor.FireInputEvent(EditorInputEvent.EdgeHover, new EditorInputOnEdgeArgs { Edge = edge });
-            line.MouseExited += () => _editor.FireInputEvent(EditorInputEvent.EdgeUnhover, new EditorInputOnEdgeArgs { Edge = edge });
+            line.MouseEntered += () =>
+                _editor.FireInputEvent(
+                    EditorInputEvent.EdgeHover,
+                    new EditorInputOnEdgeArgs { Edge = edge }
+                );
+            line.MouseExited += () =>
+                _editor.FireInputEvent(
+                    EditorInputEvent.EdgeUnhover,
+                    new EditorInputOnEdgeArgs { Edge = edge }
+                );
 
             edge.Sprite = line;
             edgesContainer.AddChild(line);
@@ -78,35 +114,42 @@ namespace signallerMap.Scripts.Graphics
 
         public void SelectEdgePair(List<MapEdge> edges)
         {
-            if (edges.Count > 0 && edges[0]?.Sprite != null) edges[0].Sprite.Color = colors.SelectedEdgeColor;
-            if (edges.Count > 1 && edges[1]?.Sprite != null) edges[1].Sprite.Color = colors.SecondSelectedEdgeColor;
+            if (edges.Count > 0 && edges[0]?.Sprite != null)
+                edges[0].Sprite.Color = colors.SelectedEdgeColor;
+            if (edges.Count > 1 && edges[1]?.Sprite != null)
+                edges[1].Sprite.Color = colors.SecondSelectedEdgeColor;
         }
-        
+
         public void SelectEdge(MapEdge edge)
         {
-            if (edge == null || !IsInstanceValid(edge.Sprite)) return;
+            if (edge == null || !IsInstanceValid(edge.Sprite))
+                return;
             edge.Sprite.Color = colors.SelectedEdgeColor;
         }
 
         public void ChangeEdgeColor(MapEdge edge, Color color)
         {
-            if (edge == null) return;
+            if (edge == null)
+                return;
             edge.Sprite.Color = color;
         }
 
         public void DeselectEdge(MapEdge edge)
         {
-            if (edge == null || edge.Sprite == null) return;
+            if (edge == null || edge.Sprite == null)
+                return;
             edge.Sprite.Color = LineColor;
         }
 
         public void DrawNode(MapNode node)
         {
-            IEnumerable<Sprite2D> childrenNodes = nodesContainer.GetChildren().Where(c => c is Sprite2D).Cast<Sprite2D>();
+            IEnumerable<Sprite2D> childrenNodes = nodesContainer
+                .GetChildren()
+                .Where(c => c is Sprite2D)
+                .Cast<Sprite2D>();
             var children = nodesContainer.GetChildren();
-            if (childrenNodes.Any(
-                n => n.Position.IsEqualApprox(node.Position)
-            )) return;
+            if (childrenNodes.Any(n => n.Position.IsEqualApprox(node.Position)))
+                return;
 
             Sprite2D sprite = new Sprite2D()
             {
@@ -115,7 +158,7 @@ namespace signallerMap.Scripts.Graphics
                 Position = Vector2.Zero,
                 GlobalPosition = node.Position,
                 Scale = new Vector2(0.35f, 0.35f),
-                ZIndex = 10
+                ZIndex = 10,
             };
             node.Sprite = sprite;
 
@@ -123,7 +166,7 @@ namespace signallerMap.Scripts.Graphics
             area.ZIndex = 10;
             var collision = new CollisionShape2D
             {
-                Shape = new RectangleShape2D { Size = sprite.Texture.GetSize() }
+                Shape = new RectangleShape2D { Size = sprite.Texture.GetSize() },
             };
 
             area.AddChild(collision);
@@ -131,31 +174,50 @@ namespace signallerMap.Scripts.Graphics
 
             area.InputEvent += (viewport, @event, shapeIdx) =>
             {
-                if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
-                    _editor.FireInputEvent(EditorInputEvent.NodeClick, new EditorInputOnNodeArgs { Node = node });
+                if (
+                    @event is InputEventMouseButton mb
+                    && mb.Pressed
+                    && mb.ButtonIndex == MouseButton.Left
+                )
+                    _editor.FireInputEvent(
+                        EditorInputEvent.NodeClick,
+                        new EditorInputOnNodeArgs { Node = node }
+                    );
             };
 
-            area.MouseEntered += () => _editor.FireInputEvent(EditorInputEvent.NodeHover, new EditorInputOnNodeArgs { Node = node });
-            area.MouseExited += () => _editor.FireInputEvent(EditorInputEvent.NodeUnhover, new EditorInputOnNodeArgs { Node = node });
+            area.MouseEntered += () =>
+                _editor.FireInputEvent(
+                    EditorInputEvent.NodeHover,
+                    new EditorInputOnNodeArgs { Node = node }
+                );
+            area.MouseExited += () =>
+                _editor.FireInputEvent(
+                    EditorInputEvent.NodeUnhover,
+                    new EditorInputOnNodeArgs { Node = node }
+                );
 
             nodesContainer.AddChild(sprite);
         }
 
         public void SelectNodePair(List<MapNode> nodes)
         {
-            if (nodes.Count > 0 && nodes[0]?.Sprite != null) nodes[0].Sprite.Modulate = colors.SelectedNodeColor;
-            if (nodes.Count > 1 && nodes[1]?.Sprite != null) nodes[1].Sprite.Modulate = colors.SecondSelectedNodeColor;
+            if (nodes.Count > 0 && nodes[0]?.Sprite != null)
+                nodes[0].Sprite.Modulate = colors.SelectedNodeColor;
+            if (nodes.Count > 1 && nodes[1]?.Sprite != null)
+                nodes[1].Sprite.Modulate = colors.SecondSelectedNodeColor;
         }
 
         public void SelectNode(MapNode node)
         {
-            if (node == null) return;
+            if (node == null)
+                return;
             node.Sprite.Modulate = colors.SelectedNodeColor;
         }
 
         public void DeselectNode(MapNode node)
         {
-            if (node == null || node.Sprite == null) return;
+            if (node == null || node.Sprite == null)
+                return;
             node.Sprite.Modulate = LineColor;
         }
 
@@ -173,7 +235,6 @@ namespace signallerMap.Scripts.Graphics
             Vector2 offset = new Vector2(0, -SignalYOffset).Rotated(angle);
             position += offset;
 
-            
             Sprite2D sprite = new()
             {
                 Name = signal.Id,
@@ -181,7 +242,7 @@ namespace signallerMap.Scripts.Graphics
                 Texture = texture,
                 Rotation = angle,
                 TextureFilter = TextureFilterEnum.Nearest,
-                Scale = new Vector2(0.5f, 0.5f) 
+                Scale = new Vector2(0.5f, 0.5f),
             };
 
             signal.Sprite = sprite;
@@ -190,13 +251,15 @@ namespace signallerMap.Scripts.Graphics
 
         public void SelectSignal(MapSignal signal)
         {
-            if (signal.Sprite == null) return;
+            if (signal.Sprite == null)
+                return;
             signal.Sprite.Modulate = new Color(10f, 10f, 10f);
         }
 
         public void DeselectSignal(MapSignal signal)
         {
-            if (signal.Sprite == null) return;
+            if (signal.Sprite == null)
+                return;
             signal.Sprite.Modulate = Colors.White;
         }
 
@@ -207,16 +270,100 @@ namespace signallerMap.Scripts.Graphics
                 SignalState.Danger => dangerSignalTexture,
                 SignalState.DoubleYellow => preliminaryCautionSignalTexture,
                 SignalState.Caution => cautionSignalTexture,
-                _ => proceedSignalTexture
+                _ => proceedSignalTexture,
             };
         }
 
         public void SetSignalState(MapSignal signal, SignalState state)
         {
-            if (signal.Sprite == null) return;
+            if (signal.Sprite == null)
+                return;
 
             Texture2D texture = GetTextureForSignalState(state);
             signal.Sprite.Texture = texture;
+        }
+
+        public void DrawStation(MapStation station)
+        {
+            if (station == null || station.Platforms.Count == 0) return;
+
+            MapPlatform highestPlatform = station.Platforms
+                .Where(s => s.Sprite != null)
+                .OrderBy(s => s.Sprite.GlobalPosition.Y)
+                .FirstOrDefault();
+
+            if (highestPlatform == null || highestPlatform.Edge == null) return;
+
+            float averageX = station.Platforms
+                .Select(p => p.Edge.Sprite.Position.X)
+                .Distinct()
+                .Average();
+
+            Label sprite = new()
+            {
+                Text = station.Name,
+                Position = new Vector2(averageX, highestPlatform.Edge.Sprite.Position.Y - StationTitleOffset),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            sprite.Size = new Vector2(highestPlatform.Edge.Sprite.Size.X, sprite.Size.Y);
+
+            station.Sprite = sprite;
+            labelsContainer.AddChild(sprite);
+        }
+
+        public void UpdateStationSprite(MapStation station)
+        {
+            if (station == null) return;
+            if (station.Sprite != null) station.Sprite.QueueFree();
+            DrawStation(station);
+        }
+
+        public void DrawPlatform(MapPlatform platform)
+        {
+            if (platform.Edge == null) return;
+            bool drawAbove = platform.VerticalAlignment == PlatformVerticalAlignment.Above ? true : false;
+
+            Vector2 size = new Vector2(platform.Edge.Sprite.Size.X, PlatformWidth);
+            // Vector2 offset = new Vector2(0, PlatformOffset + size.Y);
+            // if (alignment == PlatformVerticalAlignment.Below) { offset *= -1; offset -= new Vector2(0, size.Y); }
+
+            Vector2 offset;
+
+            if (drawAbove)
+            {
+                offset = new Vector2(0, -(PlatformOffset + size.Y - (LineWidth / 2f)));
+            }
+            else
+            {
+                offset = new Vector2(0, PlatformOffset + (LineWidth / 2f));
+            }
+
+            ColorRect sprite = new()
+            {
+                Position = offset,
+                Size = size,
+                Color = PlatformColor,
+                PivotOffsetRatio = new Vector2(0, 0.5f)
+            };
+
+            Label spriteLabel = new()
+            {
+                Text = $"Platform {platform.Number}",
+                Size = sprite.Size,
+                Position = Vector2.Zero,
+                PivotOffsetRatio = new Vector2(0.5f, 0.5f),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            spriteLabel.AddThemeFontSizeOverride("font_size", 10);
+
+            sprite.AddChild(spriteLabel);
+
+            platform.Edge.Sprite.AddChild(sprite);
+            platform.Sprite = sprite;
         }
 
         // public void LoadStumps()
@@ -226,7 +373,7 @@ namespace signallerMap.Scripts.Graphics
         //     {
         //         if (edge.From.IncomingEdges.Count == 0)
         //             DrawStump(edge, edge.From);
-        //         else if (edge.To.OutgoingEdges.Count == 0) 
+        //         else if (edge.To.OutgoingEdges.Count == 0)
         //             DrawStump(edge, edge.To);
         //     }
         // }
@@ -273,7 +420,6 @@ namespace signallerMap.Scripts.Graphics
         //     stationNode.Name = station.Id;
 
         //     stationsContainer.AddChild(stationNode);
-
 
         //     foreach (MapStationPlatform platform in station.Platforms)
         //     {
@@ -337,8 +483,6 @@ namespace signallerMap.Scripts.Graphics
         //     }
         // }
 
-
-
         // public void UpdateAllSections()
         // {
         //     foreach (MapEdge section in MapData.Edges)
@@ -399,7 +543,6 @@ namespace signallerMap.Scripts.Graphics
         // {
         //     sectionEdge.Sprite.DefaultColor = LineColor;
         // }
-
     }
 
     internal partial class UiMapEdge : Line2D

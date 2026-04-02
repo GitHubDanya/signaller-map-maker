@@ -1,33 +1,52 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using System.Collections.Generic;
 using Godot;
-using signallerMap.Scripts.editor;
 
 namespace signallerMap.Scripts.Data
 {
-    internal class JsonParser
+    internal static class MapConverters
     {
-        public List<MapNode> ConvertToMapNodes(List<JsonMapNode> jsonNodes)
+        public static MapConverter<MapNode, JsonMapNode> Node = new(new NodeConversionMethod());
+        public static MapConverter<MapEdge, JsonMapEdge> Edge = new(new EdgeConversionMethod());
+        public static MapConverter<MapStation, JsonMapStation> Station = new(new StationConversionMethod());
+        public static MapConverter<MapPlatform, JsonMapPlatform> Platform = new(new PlatformConversionMethod());
+        public static MapConverter<MapMovement, JsonMapMovement> Movement = new(new MovementConversionMethod());
+        public static MapConverter<MapSignal, JsonMapSignal> Signal = new(new SignalConversionMethod());
+    }
+
+    internal class MapConverter<T, TJson>
+    {
+        private IJsonConversionMethod<T, TJson> conversionMethod;
+
+        internal MapConverter(IJsonConversionMethod<T, TJson> method)
         {
-            List<MapNode> nodes = new();
-            foreach (JsonMapNode node in jsonNodes) nodes.Add(JSONToMapNode(node));
-            return nodes;
-        }
-        public List<JsonMapNode> ConvertToJsonMapNodes(List<MapNode> nodes)
-        {
-            List<JsonMapNode> jsonMapNodes = new();
-            foreach (MapNode node in nodes) jsonMapNodes.Add(MapNodeToJSON(node));
-            return jsonMapNodes;
+            conversionMethod = method;
         }
 
-        private JsonMapNode MapNodeToJSON(MapNode node)
+        public List<T> ParseFromJson(IEnumerable<TJson> json)
         {
-            return new(node.Id, new[] {node.Position.X, node.Position.Y});
+            return json.Where(j => j != null)
+             .Select(j => conversionMethod.ParseJson(j))
+             .ToList();
         }
-        
-        private MapNode JSONToMapNode(JsonMapNode jsonNode)
+
+        public List<TJson> ParseToJSON(IEnumerable<T> source)
+        {
+            return source.Where(s => s != null)
+             .Select(s => conversionMethod.ToJson(s))
+             .ToList();
+        }
+    }
+
+    internal class NodeConversionMethod : IJsonConversionMethod<MapNode, JsonMapNode>
+    {
+        public JsonMapNode ToJson(MapNode node)
+        {
+            return new(node.Id, new[] { node.Position.X, node.Position.Y });
+        }
+
+        public MapNode ParseJson(JsonMapNode jsonNode)
         {
             string id = jsonNode.id;
             if (jsonNode.id.Length < 2) id = "XX000";
@@ -42,26 +61,11 @@ namespace signallerMap.Scripts.Data
                 Movements = new()
             };
         }
+    }
 
-        public List<MapEdge> ConvertToMapEdges(List<JsonMapEdge> jsonEdges)
-        {
-            List<MapEdge> edges = new();
-            foreach (JsonMapEdge jsonEdge in jsonEdges)
-            {
-                MapEdge edge = JSONToMapEdge(jsonEdge);
-                if (edge != null) edges.Add(edge);
-            }
-            return edges;
-        }
-
-        public List<JsonMapEdge> ConvertToJsonMapEdges(List<MapEdge> edges)
-        {
-            List<JsonMapEdge> jsonMapEdges = new();
-            foreach (MapEdge edge in edges) jsonMapEdges.Add(MapEdgeToJSON(edge));
-            return jsonMapEdges;
-        }
-
-        private JsonMapEdge MapEdgeToJSON(MapEdge edge)
+    internal class EdgeConversionMethod : IJsonConversionMethod<MapEdge, JsonMapEdge>
+    {
+        public JsonMapEdge ToJson(MapEdge edge)
         {
             return new(
                 id: edge.Id,
@@ -69,50 +73,84 @@ namespace signallerMap.Scripts.Data
                 from: edge.From.Id,
                 to: edge.To.Id,
                 length: edge.Length,
-                max_speed: edge.MaxSpeed
+                max_speed: edge.MaxSpeed,
+                z_index: edge.Zindex
             );
         }
 
-        private MapEdge JSONToMapEdge(JsonMapEdge jsonEdge)
+        public MapEdge ParseJson(JsonMapEdge jsonEdge)
         {
             MapNode from = MapData.Nodes.FirstOrDefault(n => n.Id == jsonEdge.from);
             MapNode to = MapData.Nodes.FirstOrDefault(n => n.Id == jsonEdge.to);
             if (from == null || to == null) return null;
-            return new ()
+            return new()
             {
                 Id = jsonEdge.id,
                 StationId = jsonEdge.station_id,
                 From = from,
                 To = to,
                 Length = jsonEdge.length,
-                MaxSpeed = jsonEdge.max_speed
+                MaxSpeed = jsonEdge.max_speed,
+                Zindex = jsonEdge.z_index
             };
         }
+    }
 
-        public List<MapMovement> ConvertToToMapMovements(List<JsonMapMovement> movements)
+    internal class StationConversionMethod : IJsonConversionMethod<MapStation, JsonMapStation>
+    {
+        public JsonMapStation ToJson(MapStation station)
         {
-            List<MapMovement> mapMovements = new();
-            foreach (JsonMapMovement movement in movements) mapMovements.Add(JSONToMapMovement(movement));
-            return mapMovements;
+            return new(
+                station.Id.ToString(),
+                station.Name,
+                station.Platforms.Select(p => p.Id.ToString()).ToArray()
+            );
         }
 
-        public List<JsonMapMovement> ConvertToJsonMapMovements(List<MapMovement> movements)
+        public MapStation ParseJson(JsonMapStation jsonStation)
         {
-            List<JsonMapMovement> mapMovements = new();
-            foreach (MapMovement movement in movements) mapMovements.Add(MapMovementToJSON(movement));
-            return mapMovements;
-        }
-
-        private MapMovement JSONToMapMovement(JsonMapMovement movement)
-        {
+            List<MapPlatform> platforms = MapData.Platforms.Where(p => p.Station.Name == jsonStation.name).ToList();
             return new()
             {
-                from = MapData.Edges.FirstOrDefault(e => e.Id == movement.from),
-                to = MapData.Edges.FirstOrDefault(e => e.Id == movement.to)
+                Id = jsonStation.id,
+                Name = jsonStation.name,
+                Platforms = platforms
             };
         }
-        
-        public JsonMapMovement MapMovementToJSON(MapMovement movement)
+    }
+
+    internal class PlatformConversionMethod : IJsonConversionMethod<MapPlatform, JsonMapPlatform>
+    {
+        public JsonMapPlatform ToJson(MapPlatform platform)
+        {
+            return new(
+                    platform.Id,
+                    platform.Number,
+                    platform.Edge.Id,
+                    platform.Station.Id,
+                    platform.VerticalAlignment.ToString()
+                    );
+        }
+
+        public MapPlatform ParseJson(JsonMapPlatform jsonPlatform)
+        {
+            MapEdge edge = MapData.Edges.FirstOrDefault(e => e.Id == jsonPlatform.edge);
+            MapStation station = MapData.Stations.FirstOrDefault(s => s.Id == jsonPlatform.station);
+
+            return new()
+            {
+                Id = jsonPlatform.id,
+                Number = jsonPlatform.number,
+                Edge = edge,
+                Station = station,
+                VerticalAlignment = Enum.Parse<PlatformVerticalAlignment>(jsonPlatform.verticalalignment)
+            };
+        }
+    }
+
+    internal class MovementConversionMethod : IJsonConversionMethod<MapMovement, JsonMapMovement>
+    {
+        public JsonMapMovement ToJson(MapMovement movement)
         {
             return new(
                 from: movement.from.Id,
@@ -120,21 +158,29 @@ namespace signallerMap.Scripts.Data
             );
         }
 
-        public List<MapSignal> ConvertToMapSignals(List<JsonMapSignal> signals)
+        public MapMovement ParseJson(JsonMapMovement movement)
         {
-            List<MapSignal> mapSignals = new();
-            foreach (JsonMapSignal signal in signals) mapSignals.Add(JsonToMapSignal(signal));
-            return mapSignals;
+            return new()
+            {
+                from = MapData.Edges.FirstOrDefault(e => e.Id == movement.from),
+                to = MapData.Edges.FirstOrDefault(e => e.Id == movement.to)
+            };
+        }
+    }
+
+    internal class SignalConversionMethod : IJsonConversionMethod<MapSignal, JsonMapSignal>
+    {
+        public JsonMapSignal ToJson(MapSignal signal)
+        {
+            return new(
+                id: signal.Id,
+                node: signal.Node.Id,
+                edge: signal.Movement.from.Id,
+                state: signal.State.ToString().ToLower()
+            );
         }
 
-        public List<JsonMapSignal> ConvertToJsonMapSignals(List<MapSignal> signals)
-        {
-            List<JsonMapSignal> mapSignals = new();
-            foreach (MapSignal signal in signals) mapSignals.Add(MapSignalToJSON(signal));
-            return mapSignals;
-        }
-
-        private MapSignal JsonToMapSignal(JsonMapSignal signal)
+        public MapSignal ParseJson(JsonMapSignal signal)
         {
             MapNode node = MapData.Nodes.FirstOrDefault(n => n.Id == signal.node);
             return new()
@@ -151,15 +197,11 @@ namespace signallerMap.Scripts.Data
                 }
             };
         }
-        
-        public JsonMapSignal MapSignalToJSON(MapSignal signal)
-        {
-            return new(
-                id: signal.Id,
-                node: signal.Node.Id,
-                edge: signal.Movement.from.Id,
-                state: signal.State.ToString().ToLower()
-            );
-        } 
+    }
+
+    internal interface IJsonConversionMethod<T, TJson>
+    {
+        public TJson ToJson(T source);
+        public T ParseJson(TJson json);
     }
 }

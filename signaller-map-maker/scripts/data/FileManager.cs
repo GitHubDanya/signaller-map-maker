@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using System.Text.Json;
 using System.Collections.Generic;
@@ -9,12 +8,7 @@ namespace signallerMap.Scripts.Data
     internal partial class FileManager : Node2D
     {
         [Export] Editor _editor;
-        private List<JsonMapEdge> jsonMapEdges;
-        private List<JsonMapNode> jsonMapNodes;
-        private List<JsonMapMovement> jsonMapMovements;
-        private List<JsonMapSignal> jsonMapSignals;
-        private JsonParser parser = new();
-        
+
         public void LoadData()
         {
             OpenNativeLoadDialog();
@@ -35,7 +29,7 @@ namespace signallerMap.Scripts.Data
                 false,                    // Filter indexing (usually false)
                 DisplayServer.FileDialogMode.SaveFile,
                 filters,
-                Callable.From<bool, string[], int>(OnNativeSaveFileSelected)
+                Callable.From<bool, string[], int>(SaveMapToFile)
             );
         }
         public void OpenNativeLoadDialog()
@@ -49,131 +43,105 @@ namespace signallerMap.Scripts.Data
                 false,
                 DisplayServer.FileDialogMode.OpenFile,
                 filters,
-                Callable.From<bool, string[], int>(OnNativeLoadFileSelected)
+                Callable.From<bool, string[], int>(LoadMapFromFile)
             );
         }
 
-        private void OnNativeSaveFileSelected(bool status, string[] selectedPaths, int filterIndex)
+        private async void LoadMapFromFile(bool status, string[] selectedPaths, int filterIndex)
         {
-            if (status && selectedPaths.Length > 0)
-            {
-                string fullPath = selectedPaths[0];
-                SaveJSONToPath(fullPath);
-            }
-        }
+            if (!status || selectedPaths.Length <= 0) return;
 
-        private void OnNativeLoadFileSelected(bool status, string[] selectedPaths, int filterIndex)
-        {
-            if (status && selectedPaths.Length > 0)
-            {
-                string fullPath = selectedPaths[0];
-                LoadMapFromJSON(fullPath);
-            }
-        }
+            string filePath = selectedPaths[0];
 
-        private void SaveJSONToPath(string path)
-        {
-            jsonMapNodes = parser.ConvertToJsonMapNodes(MapData.Nodes);
-            jsonMapEdges = parser.ConvertToJsonMapEdges(MapData.Edges);
-            jsonMapMovements = new();
-            foreach (MapNode node in MapData.Nodes)
-            jsonMapMovements.AddRange(parser.ConvertToJsonMapMovements(node.Movements));
-            jsonMapSignals = parser.ConvertToJsonMapSignals(MapData.Signals);
-
-            var data = new {
-                nodes = jsonMapNodes,
-                edges = jsonMapEdges,
-                movements = jsonMapMovements,
-                signals = jsonMapSignals };
-
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            string jsonString = JsonSerializer.Serialize(data, options);
-
-            using var file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
-            if (file != null)
-            {
-                file.StoreString(jsonString);
-            }
-        }
-
-        private void SaveMapToJSON()
-        {
-            
-        }
-
-        private async void LoadMapFromJSON(string path)
-        {
-            using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
-
-            if (file == null)
-            {
-                GD.PrintErr($"Could not open file at {path}. Error: {FileAccess.GetOpenError()}");
-                return;
-            }
-
-            string jsonContent = file.GetAsText();
-            JsonDocument mapdata = JsonDocument.Parse(jsonContent);
+            string fileContent = ReadFile(filePath);
+            if (string.IsNullOrEmpty(fileContent)) return;
+            JsonDocument mapdata = JsonDocument.Parse(fileContent);
 
             _editor.CleanMap();
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
+
             Callable.From(() =>
-            {
-                List<MapNode> nodes = parser.ConvertToMapNodes(loadJsonNodesFromData(mapdata));
-                foreach (MapNode node in nodes) _editor.CreateNode(node);
-                List<MapEdge> edges = parser.ConvertToMapEdges(loadJsonEdgesFromData(mapdata));
-                foreach (MapEdge edge in edges) _editor.CreateEdge(edge);
-                List<MapMovement> movements = parser.ConvertToToMapMovements(loadJsonMovementsFromData(mapdata));
-                foreach (MapMovement movement in movements) _editor.CreateMovement(movement);
-                List<MapSignal> signals = parser.ConvertToMapSignals(loadJsonSignalsFromData(mapdata));
-                foreach (MapSignal signal in signals) _editor.CreateSignal(signal);
-            }).CallDeferred();
+                    {
+                        List<MapNode> nodes = MapConverters.Node.ParseFromJson(LoadJsonObject<JsonMapNode>(mapdata, "nodes"));
+                        foreach (MapNode node in nodes) _editor.CreateNode(node);
+
+                        List<MapEdge> edges = MapConverters.Edge.ParseFromJson(LoadJsonObject<JsonMapEdge>(mapdata, "edges"));
+                        foreach (MapEdge edge in edges) _editor.CreateEdge(edge);
+
+                        List<MapStation> stations = MapConverters.Station.ParseFromJson(LoadJsonObject<JsonMapStation>(mapdata, "stations"));
+                        foreach (MapStation station in stations) _editor.CreateStation(station);
+
+                        List<MapPlatform> platforms = MapConverters.Platform.ParseFromJson(LoadJsonObject<JsonMapPlatform>(mapdata, "platforms"));
+                        foreach (MapPlatform platform in platforms) _editor.CreatePlatform(platform);
+
+                        List<MapMovement> movements = MapConverters.Movement.ParseFromJson(LoadJsonObject<JsonMapMovement>(mapdata, "movements"));
+                        foreach (MapMovement movement in movements) _editor.CreateMovement(movement);
+
+                        List<MapSignal> signals = MapConverters.Signal.ParseFromJson(LoadJsonObject<JsonMapSignal>(mapdata, "signals"));
+                        foreach (MapSignal signal in signals) _editor.CreateSignal(signal);
+                    }).CallDeferred();
 
             CommandManager.Clear();
         }
 
-        private List<JsonMapNode> loadJsonNodesFromData(JsonDocument mapdata)
+        private string ReadFile(string filePath)
         {
-            List<JsonMapNode> jsonMapNodes = new();
-            foreach (var node in mapdata.RootElement.GetProperty("nodes").EnumerateArray())
-            {
-                JsonMapNode jsonNode = JsonSerializer.Deserialize<JsonMapNode>(node.GetRawText());
-                if (jsonNode != null) jsonMapNodes.Add(jsonNode);
-            }
-            return jsonMapNodes;
-        } 
+            using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
 
-        private List<JsonMapEdge> loadJsonEdgesFromData(JsonDocument mapdata)
-        {
-            List<JsonMapEdge> jsonMapEdges = new();
-            foreach (var edge in mapdata.RootElement.GetProperty("edges").EnumerateArray())
+            if (file == null)
             {
-                JsonMapEdge jsonEdge = JsonSerializer.Deserialize<JsonMapEdge>(edge.GetRawText());
-                if (jsonEdge != null) jsonMapEdges.Add(jsonEdge);
+                GD.PrintErr($"Could not open file at {filePath}. Error: {FileAccess.GetOpenError()}");
+                return string.Empty;
             }
-            return jsonMapEdges;
-        } 
 
-        private List<JsonMapMovement> loadJsonMovementsFromData(JsonDocument mapdata)
-        {
-            List<JsonMapMovement> jsonMapMovements = new();
-            foreach (var movement in mapdata.RootElement.GetProperty("movements").EnumerateArray())
-            {
-                JsonMapMovement jsonMovement = JsonSerializer.Deserialize<JsonMapMovement>(movement.GetRawText());
-                if (jsonMovement != null) jsonMapMovements.Add(jsonMovement);
-            }
-            return jsonMapMovements;
+            return file.GetAsText();
         }
 
-        private List<JsonMapSignal> loadJsonSignalsFromData(JsonDocument mapdata)
+        private void SaveMapToFile(bool status, string[] selectedPaths, int filterIndex)
         {
-            List<JsonMapSignal> jsonSignals = new();
-            foreach (var signal in mapdata.RootElement.GetProperty("signals").EnumerateArray())
+            if (!status || selectedPaths.Length <= 0) return;
+
+            string filePath = selectedPaths[0];
+
+            using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
+            if (file == null) return;
+
+            List<JsonMapNode> nodes = MapConverters.Node.ParseToJSON(MapData.Nodes);
+            List<JsonMapEdge> edges = MapConverters.Edge.ParseToJSON(MapData.Edges);
+            List<JsonMapStation> stations = MapConverters.Station.ParseToJSON(MapData.Stations);
+            List<JsonMapPlatform> platforms = MapConverters.Platform.ParseToJSON(MapData.Platforms);
+            List<JsonMapSignal> signals = MapConverters.Signal.ParseToJSON(MapData.Signals);
+
+            HashSet<JsonMapMovement> movements = new();
+            foreach (MapNode node in MapData.Nodes)
+                movements.UnionWith(MapConverters.Movement.ParseToJSON(node.Movements));
+
+            var data = new
             {
-                JsonMapSignal jsonMapSignal = JsonSerializer.Deserialize<JsonMapSignal>(signal.GetRawText());
-                if (jsonMapSignal != null) jsonMapSignals.Add(jsonMapSignal);
+                nodes = nodes,
+                edges = edges,
+                stations = stations,
+                platforms = platforms,
+                signals = signals,
+                movements = movements,
+            };
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(data, options);
+
+            file.StoreString(jsonString);
+        }
+
+        private List<T> LoadJsonObject<T>(JsonDocument mapdata, string objName)
+        {
+            List<T> jsonObjects = new();
+            foreach (var obj in mapdata.RootElement.GetProperty(objName).EnumerateArray())
+            {
+                T jsonObj = JsonSerializer.Deserialize<T>(obj.GetRawText());
+                if (jsonObj != null) jsonObjects.Add(jsonObj);
             }
-            return jsonMapSignals;
+            return jsonObjects;
         }
     }
 }

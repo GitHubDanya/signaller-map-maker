@@ -1,9 +1,9 @@
 using Godot;
-using System;
 
 namespace signallerMap.Scripts.editor
 {
     internal class EditorInputEventArgs { }
+
     internal class EditorUiEventArgs { }
 
     internal class EditorUiCreateEdgeArgs : EditorUiEventArgs
@@ -12,7 +12,13 @@ namespace signallerMap.Scripts.editor
         public string EdgeZindex;
         public string EdgeSpeed;
         public bool IsStump;
-    }   
+    }
+
+    internal class EditorUiStationEvent : EditorUiEventArgs
+    {
+        public string StationName;
+        public PlatformVerticalAlignment Side;
+    }
 
     internal class EditorInputMouseClickArgs : EditorInputEventArgs
     {
