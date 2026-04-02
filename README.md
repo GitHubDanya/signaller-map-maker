@@ -1,4 +1,7 @@
 # Map maker for the signaller simulator
+![Static Badge](https://img.shields.io/badge/made_with-godot-blue?logo=godot-engine&link=godotengine.org)
+
+
 This repository holds the source code a native map editor helper tool for [`signaller`](https://github.com/GitHubDanya/signaller).
 It provides a graphical interface for plotting simulation maps instead of having to write JSON manually.
 
