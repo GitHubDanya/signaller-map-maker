@@ -4,38 +4,63 @@ It provides a graphical interface for plotting simulation maps instead of having
 
 ## Shortcuts
 
+-- Mode Selection:
+* `1` - Select Build Mode
+* `2` - Select Movement Mode
+
+-- Build Mode:
 * `LMB` - Draw Node
-* `R` - Draw edge
-* `Ctrl+R` - Delete edge
-* `Ctrl+E` - Delete edge
+* `Ctrl+E` - Delete Node
+* `R` - Draw Edge
+* `Ctrl+R` - Delete Edge
+
+-- Movement Mode:
+* `W` - Create Movement
+* `E` - Create Signal
+
+The editor supports action history.
+* `Ctrl+Z` - Undo
+* `Ctrl+Y` - Redo
 
 ## Usage Guide
 When you open the editor you will be greeted with a grid. Each bold grid space represents a `100x100px` field, and each subdivision represents a `25x25px` square.
-You can drag the map with LMB.
+You can drag the map with `LMB`.
 
+The editor has different modes for various actions. They are:
 
-### Selection Mechanic
-You can select nodes and edges by clicking on them. You can have up to 2 nodes selected at a time.
+* **Build Mode** - This mode is responsible for building the map. It is used for creating `Nodes`, `Edges`, `Stations` and `Platforms`. Shortcuts for this mode can
+be seen in the `shortcuts` section.
 
-Nodes are selected sequentially and are tied to the order of selection. The current selected node is displayed as yellow, and the second selected node is displayed as a lighter
-yellow.
+* **Movement Mode** - This mode is responsible for handling anything related to train movement across the map. It is used for defining `Movements` across edges,
+creating and modifying `Signals`.
 
-The current selected edge is displayed as orange.
+To switch between the modes, use the number keys.
 
+The UI updates dynamically to fit the current `Editor Mode`.
 
-### Drawing Nodes
-To draw a node, you can click anywhere on the grid with `LMB`. Nodes get their ID's assigned automatically with the prefix assigned at the `Node` page of the UI.
+## Using the Build Mode
 
+The map consists of Nodes and Edges to define movement points for trains. Edges are lines that are created between 2 nodes.
 
-### Drawing Edges
-To draw an edge, ensure that you have:
-* 2 nodes selected.
-* Assigned a Length and Width in the `Edge` section of the UI.
-  
-then either click the `'Create'` button in the `Edge` UI section, or use the keyboard shortcut `E`.
-This action creates an edge, where the edge spans from the oldest selected node to the newest selected node.
+**Nodes** are created with mouse clicks. The prefix for the node can be specified in the UI. Nodes without a prefix get assigned the prefix `XX`.
 
-To delete edges, press the `'Delete'` button in the `Edge` UI section, or use the keyboard shortcut `Ctrl + E`.
+**Edges** are created by either pressing the Create button on the UI or pressing R. To create an Edge, you must have 2 nodes selected, and
+have populated the `Length`, `Speed` and `Z-Index` fields. It is recommended to always create Edges in the same direction as the expected
+train flow through them (for example left-to-right if trains are expected to move to the right). This makes naming more concise and easier to understand.
 
-### Saving Data
-To save data, click the `Save JSON` button in the `JSON` section of the UI.
+**Stations** are created automatically with platform creation. Platforms automatically get assigned the station selected in the `Station Name` field,
+and if no existing station exists then a new station gets created.
+
+**Platforms** are created by clicking either the `Plat. Above` or `Plat. Below` button. Station assignment works as described in the `Stations` section.
+
+## Using the Movement Mode
+
+**Movements** define how trains move through edges. To create a movement, first select the source edge, then the destination edge, then press `W`.
+Existing movements can be checked by hovering over an edge.
+
+**Signals** ensure that a movement is legal. To create a signal, select the edge that the signal is on, then the edge that the signal
+should point towards. Note that there is no need to create multiple signals for each movement if the source edge is the same, the movements are assigned automatically
+in the simulator. You can cycle the default signal state by pressing the `Cycle` button.
+
+## Saving and Loading
+To save or load, use the corresponding `Save JSON` and `Load JSON` buttons in the UI.
