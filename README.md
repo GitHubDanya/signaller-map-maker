@@ -44,7 +44,7 @@ The map consists of Nodes and Edges to define movement points for trains. Edges 
 
 **Nodes** are created with mouse clicks. The prefix for the node can be specified in the UI. Nodes without a prefix get assigned the prefix `XX`.
 
-**Edges** are created by either pressing the Create button on the UI or pressing R. To create an Edge, you must have 2 nodes selected, and
+**Edges** are created by either pressing the Create button on the UI or pressing `R`. To create an Edge, you must have 2 nodes selected, and
 have populated the `Length`, `Speed` and `Z-Index` fields. It is recommended to always create Edges in the same direction as the expected
 train flow through them (for example left-to-right if trains are expected to move to the right). This makes naming more concise and easier to understand.
 
@@ -59,7 +59,7 @@ and if no existing station exists then a new station gets created.
 Existing movements can be checked by hovering over an edge.
 
 **Signals** ensure that a movement is legal. To create a signal, select the edge that the signal is on, then the edge that the signal
-should point towards. Note that there is no need to create multiple signals for each movement if the source edge is the same, the movements are assigned automatically
+should point towards, and then press `E`. Note that there is no need to create multiple signals for each movement if the source edge is the same, the movements are assigned automatically
 in the simulator. You can cycle the default signal state by pressing the `Cycle` button.
 
 ## Saving and Loading
