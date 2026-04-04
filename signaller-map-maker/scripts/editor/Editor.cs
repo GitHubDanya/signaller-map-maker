@@ -156,6 +156,7 @@ namespace signallerMap.Scripts.editor
                )
                 return;
 
+            signal.Node.Signals.Add(signal);
             MapData.Signals.Add(signal);
             mapGrapher.DrawSignal(signal);
         }

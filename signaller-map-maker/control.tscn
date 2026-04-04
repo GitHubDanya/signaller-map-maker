@@ -58,7 +58,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="BuildMode" type="HBoxContainer" parent="PanelContainer/MarginContainer/Contents" unique_id=1359321]
-visible = false
 layout_mode = 2
 
 [node name="NodePanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/Contents/BuildMode" unique_id=391654261]

@@ -80,7 +80,10 @@ namespace signallerMap.Scripts.Data
 
                         List<MapSignal> signals = MapConverters.Signal.ParseFromJson(LoadJsonObject<JsonMapSignal>(mapdata, "signals"));
                         foreach (MapSignal signal in signals) _editor.CreateSignal(signal);
+
+                        MapFactory.UpdateIndecies();
                     }).CallDeferred();
+
 
             CommandManager.Clear();
         }
